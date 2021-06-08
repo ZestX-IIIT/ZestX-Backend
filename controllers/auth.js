@@ -8,7 +8,7 @@ var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "verify.zestx@gmail.com",
-    pass: "7s`swkX9wz`xHr9U",
+    pass: "opznfpdfkndofxre",
   },
 });
 
@@ -42,7 +42,7 @@ exports.signUp = (req, res) => {
               from: "verify.zestx@gmail.com",
               to: `${user.email}`,
               subject: "Sending Email using Node.js",
-              text: "That was easy!",
+              text: `Hello ${user.username}!`,
             };
 
             transporter.sendMail(mailOptions, function (error, info) {

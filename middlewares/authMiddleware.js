@@ -18,7 +18,7 @@ exports.verifyToken = (req,res,next) => {
             client.query(`SELECT *FROM users where email = '${userEmail}'`).then((data) => {
                 if(data.rows.length == 0){
                     res.status(400).json({
-                        message: "Invalid token",
+                        message: "User does not exist",
                     });
                 }else{
                     req.email = userEmail;
