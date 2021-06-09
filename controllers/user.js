@@ -20,7 +20,7 @@ exports.verifyUser = (req, res) => {
     .query(`UPDATE users SET is_verified=${boolvalue} where email='${userEmail}'`)
     .then((data) => {
         res.status(200);
-        res.sendFile('C:/Users/Harshil/Documents/CPP Code/ZestX-Backend/user_verified.html');
+        res.sendFile('user_verified.html');
     })
     .catch((err) => {
         res.status(400).json({
