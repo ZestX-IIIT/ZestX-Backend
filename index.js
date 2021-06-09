@@ -6,6 +6,8 @@ const festRoutes = require("./routes/fest");
 const client = require("./configs/database");
 require("dotenv").config();
 
+const socket = io.listen(process.env.PORT);
+
 const app = express();
 
 const port = process.env.PORT || 8000;
