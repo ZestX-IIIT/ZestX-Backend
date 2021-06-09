@@ -22,7 +22,6 @@ app.use("/user",userRoutes);
 app.use("/fest",festRoutes);
 
 client.connect(() => {
-    console.log("Database_URL", process.env.PSQL_URL);
     console.log(`database connected`);
 })
 
