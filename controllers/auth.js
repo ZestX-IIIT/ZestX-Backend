@@ -4,6 +4,8 @@ const client = require("../configs/database");
 require("dotenv").config();
 var nodemailer = require("nodemailer");
 
+const baseurl_for_user_verification = "http://rajvarsani.github.io/ZestX/";
+
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -38,21 +40,6 @@ exports.signUp = (req, res) => {
               mobile,
             };
 
-            var mailOptions = {
-              from: "verify.zestx@gmail.com",
-              to: `${user.email}`,
-              subject: "Sending Email using Node.js",
-              text: `Hello ${user.username}!`,
-            };
-
-            transporter.sendMail(mailOptions, function (error, info) {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log("Email sent: " + info.response);
-              }
-            });
-
             client
               .query(
                 `INSERT INTO users (user_name, email, password, mobile, is_verified) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false);`
@@ -64,6 +51,24 @@ exports.signUp = (req, res) => {
                   },
                   "" + process.env.SECRET_KEY
                 );
+
+                var link = baseurl_for_user_verification+token;
+
+                var mailOptions = {
+                  from: "verify.zestx@gmail.com",
+                  to: `${user.email}`,
+                  subject: "Confirmation mail",
+                  // text: `Hello ${user.username}!`,
+                  html: `click <a href=${link}>here</a> to confirm your mail`,
+                };
+    
+                transporter.sendMail(mailOptions, function (error, info) {
+                  if (error) {
+                    console.log(error);
+                  } else {
+                    console.log("Email sent: " + info.response);
+                  }
+                });
 
                 res.status(200).json({
                   message: "User added successfully",

@@ -9,10 +9,11 @@ exports.verifyToken = (req,res,next) => {
         if(err){
             console.log(err);
             res.status(500).json({
-                error: "server error occured",
+                error: `${err}`,
             });
             
         }else{
+
             const userEmail = decoded.email;
 
             client.query(`SELECT *FROM users where email = '${userEmail}'`).then((data) => {
