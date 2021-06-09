@@ -19,10 +19,7 @@ exports.verifyUser = (req, res) => {
     client
     .query(`UPDATE users SET is_verified=${boolvalue} where email='${userEmail}'`)
     .then((data) => {
-        res.status(200).json({
-            message: "user verified successfully!",
-            data: `${data}`
-        });
+        res.status(200).send("User verified successfully...");
     })
     .catch((err) => {
         res.status(400).json({

@@ -4,7 +4,7 @@ const client = require("../configs/database");
 require("dotenv").config();
 var nodemailer = require("nodemailer");
 
-const baseurl_for_user_verification = "http://rajvarsani.github.io/ZestX/";
+const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -58,7 +58,6 @@ exports.signUp = (req, res) => {
                   from: "verify.zestx@gmail.com",
                   to: `${user.email}`,
                   subject: "Confirmation mail",
-                  // text: `Hello ${user.username}!`,
                   html: `click <a href=${link}>here</a> to confirm your mail`,
                 };
     
