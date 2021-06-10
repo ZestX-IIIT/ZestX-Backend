@@ -1,4 +1,5 @@
 const client = require("../configs/database");
+const path = require('path');
 const jwt = require("jsonwebtoken");
 
 exports.getDetails = (req, res) => {
@@ -19,8 +20,19 @@ exports.verifyUser = (req, res) => {
     client
     .query(`UPDATE users SET is_verified=${boolvalue} where email='${userEmail}'`)
     .then((data) => {
-        res.status(200);
-        res.sendFile('user_verified.html');
+        
+        var options = {
+            root: path.join(__dirname)
+        };
+          
+        var fileName = 'user_verified.html';
+        res.status(200).sendFile(fileName, options, function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log('Sent:', fileName);
+            }
+        });
     })
     .catch((err) => {
         res.status(400).json({
