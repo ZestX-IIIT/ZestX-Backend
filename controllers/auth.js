@@ -4,7 +4,8 @@ const client = require("../configs/database");
 require("dotenv").config();
 var nodemailer = require("nodemailer");
 
-const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
+const baseurl_for_user_verification =
+  "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
 var transporter = nodemailer.createTransport({
   service: "gmail",
@@ -45,14 +46,28 @@ exports.signUp = (req, res) => {
                 `INSERT INTO users (user_name, email, password, mobile, is_verified) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false);`
               )
               .then((data1) => {
+                //TODO
+              })
+              .catch((err1) => {
+                res.status(500).json({
+                  error: `${err1}`,
+                });
+              });
+
+            client
+              .query(`SELECT * FROM users where email = '${user.email}'`)
+              .then((data1) => {
+                const userId = data1.rows[0].user_id;
+
                 const token = jwt.sign(
                   {
                     email: email,
+                    userId: userId,
                   },
                   "" + process.env.SECRET_KEY
                 );
 
-                var link = baseurl_for_user_verification+token;
+                var link = baseurl_for_user_verification + token;
 
                 var mailOptions = {
                   from: "verify.zestx@gmail.com",
@@ -60,7 +75,7 @@ exports.signUp = (req, res) => {
                   subject: "Confirmation mail",
                   html: `click <a href=${link}>here</a> to confirm your mail`,
                 };
-    
+
                 transporter.sendMail(mailOptions, function (error, info) {
                   if (error) {
                     console.log(error);
@@ -71,11 +86,11 @@ exports.signUp = (req, res) => {
 
                 res.status(200).json({
                   message: "User added successfully",
-                  token: token,
+                  data: `${token}`,
                 });
               })
               .catch((err1) => {
-                res.status(500).json({
+                res.status(400).json({
                   error: `${err1}`,
                 });
               });
@@ -97,6 +112,7 @@ exports.signIn = (req, res) => {
     .query(`SELECT *FROM users where email = '${email}'`)
     .then((data) => {
       let userData = data.rows;
+      const userId = data.rows[0].user_id;
 
       if (userData.length == 0) {
         res.status(400).json({
@@ -113,6 +129,7 @@ exports.signIn = (req, res) => {
             const token = jwt.sign(
               {
                 email: email,
+                userId: userId,
               },
               "" + process.env.SECRET_KEY
             );
