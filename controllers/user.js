@@ -40,7 +40,7 @@ exports.getDetails = (req, res) => {
     })
     .catch((err) => {
       res.status(400).json({
-        error: `${err}`,
+        error: `44${err}`,
       });
     });
 };
@@ -68,18 +68,18 @@ exports.updateDetails = (req, res) => {
               data: `${data}`,
             });
           })
-          .catch((err) => {
+          .catch((err2) => {
             res.status(400).json({
-              error: "Database error occured!",
+              error: `22${err2}`,
             });
           });
       }
     });
   } else {
-    bcrypt.hash(password, 10, (err, hash) => {
-      if (err) {
+    bcrypt.hash(password, 10, (err3, hash) => {
+      if (err3) {
         res.status(500).json({
-          error: "Internal server error",
+          error: `33${err3}`,
         });
       } else {
         client
@@ -98,7 +98,7 @@ exports.updateDetails = (req, res) => {
 
             var mailOptions = {
               from: "verify.zestx@gmail.com",
-              to: `${user.email}`,
+              to: `${email}`,
               subject: "Confirmation mail",
               html: `click <a href=${link}>here</a> to confirm your mail`,
             };
