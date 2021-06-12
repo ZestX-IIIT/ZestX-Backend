@@ -34,7 +34,6 @@ exports.getDetails = (req, res) => {
       });
 
       res.status(200).json({
-        message: "successfull!",
         data: filteredData,
       });
     })
@@ -112,7 +111,7 @@ exports.updateDetails = (req, res) => {
             });
             res.status(222).json({
               message: "updated successfully!",
-              data: `${token}`,
+              token: `${token}`,
             });
           })
           .catch((err1) => {
