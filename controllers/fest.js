@@ -87,19 +87,17 @@ exports.unregister = async (req, res) => {
       `SELECT * FROM users where user_id='${userId}'`
     );
 
-    const userName = data.rows[0].user_name;
-
     if (isEligible2(data, eventId)) {
       await client.query(
-        `UPDATE users SET fest_id = fest_id || '{${eventId}}' where user_id='${userId}';`
+        `UPDATE users SET fest_id = array_remove(fest_id, '${eventId}') WHERE user_id='${userId}';`
       );
 
       await client.query(
-        `UPDATE fest SET user_id_name = user_id_name || '{${userId},${userName}}' where fest_id='${eventId}';`
+        `UPDATE fest SET user_id= array_remove(user_id, '${userId}') WHERE fest_id='${eventId}';`
       );
 
       res.status(200).json({
-        message: "user registered successfully!",
+        message: "user unregistered successfully!",
       });
     } else {
       res.status(400).json({
