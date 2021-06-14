@@ -123,7 +123,7 @@ exports.signIn = (req, res) => {
           if (err) {
             console.log(err);
             res.status(500).json({
-              error: "server error occured!",
+              error: `${err}`,
             });
           } else if (result) {
             const token = jwt.sign(
@@ -148,7 +148,7 @@ exports.signIn = (req, res) => {
     })
     .catch((err) => {
       res.status(500).json({
-        error: "database error occured!",
+        error: `${err}`,
       });
     });
 };
