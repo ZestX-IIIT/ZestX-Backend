@@ -43,7 +43,7 @@ exports.signUp = (req, res) => {
 
             client
               .query(
-                `INSERT INTO users (user_name, email, password, mobile, is_verified) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false);`
+                `INSERT INTO users (user_name, email, password, mobile, is_verified, is_admin) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false, false);`
               )
               .then((data1) => {
                 //TODO
