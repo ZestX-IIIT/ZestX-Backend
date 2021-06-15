@@ -140,13 +140,50 @@ exports.ongoingEvents = async (req, res) => {
 };
 
 exports.addUser = async (req, res) => {
+  const adminEmail = req.email;
+  const { username, email, mobile, event_id } = req.body;
   try {
-  } catch (err) {}
+    const data = await client.query(
+      `SELECT * FROM users where email = '${adminEmail}'`
+    );
+    if (isEligible3(data)) {
+      await client.query(
+        `INSERT INTO external_users (username, email, mobile) VALUES ('${username}', '${email}', '${mobile}');`
+      );
+
+      const data1 = await client.query(
+        `SELECT userid FROM external_users where email = '${email}'`
+      );
+
+      let size = data1.rows.length;
+      const userId = data1.rows[size - 1].userid;
+
+      await client.query(
+        `UPDATE fest SET external_user_id = external_user_id || '{${userId}}' where fest_id='${event_id}';`
+      );
+
+      res.status(200).json({
+        data: "user registered successfully!",
+      });
+    } else {
+      res.status(400).json({
+        error: "You have no access!",
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
 };
 
 exports.removeUser = async (req, res) => {
   try {
-  } catch (err) {}
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
 };
 
 function isEligible(userData, festId) {
@@ -169,6 +206,14 @@ function isEligible2(userData, festId) {
   const festIdsList = userData.rows[0].fest_id;
 
   if (!festIdsList.includes(festId)) return false;
+
+  return true;
+}
+
+function isEligible3(userData) {
+  const boolvalue = userData.rows[0].is_admin;
+
+  if (!boolvalue) return false;
 
   return true;
 }
