@@ -109,6 +109,28 @@ exports.unregister = async (req, res) => {
   }
 };
 
+exports.ongoingEvents = async (req, res) => {
+  var today = new Date();
+  var dd = String(today.getDate()).padStart(2, "0");
+  var mm = String(today.getMonth() + 1).padStart(2, "0");
+  var yyyy = today.getFullYear();
+
+  today = mm + "/" + dd + "/" + yyyy;
+  console.log(today);
+  try {
+  } catch (err) {}
+};
+
+exports.addUser = async (req, res) => {
+  try {
+  } catch (err) {}
+};
+
+exports.removeUser = async (req, res) => {
+  try {
+  } catch (err) {}
+};
+
 function isEligible(userData, festId) {
   const boolvalue = userData.rows[0].is_verified;
 
