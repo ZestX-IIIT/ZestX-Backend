@@ -110,15 +110,33 @@ exports.unregister = async (req, res) => {
 };
 
 exports.ongoingEvents = async (req, res) => {
-  var today = new Date();
-  var dd = String(today.getDate()).padStart(2, "0");
-  var mm = String(today.getMonth() + 1).padStart(2, "0");
-  var yyyy = today.getFullYear();
+  var today = Date.now();
 
-  today = mm + "/" + dd + "/" + yyyy;
-  console.log(today);
+  let eventArray = [];
+  let index = 0;
+
   try {
-  } catch (err) {}
+    const data = await client.query(`SELECT * FROM fest`);
+    const festData = data.rows;
+
+    festData.map((event) => {
+      let d = parseInt(event.end_date);
+
+      if (today < d) {
+        eventArray[index] = event;
+        index++;
+        console.log(today);
+      }
+    });
+
+    res.status(200).json({
+      data: eventArray,
+    });
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
 };
 
 exports.addUser = async (req, res) => {
