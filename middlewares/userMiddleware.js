@@ -1,4 +1,4 @@
-exports.userIdParam = (req,res,next,id) => {
-    req.userId = id;
-    next();
+exports.userIdParam = (req, res, next, token) => {
+  req.userToken = token;
+  next();
 };

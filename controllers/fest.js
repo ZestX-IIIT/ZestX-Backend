@@ -1,47 +1,45 @@
 const client = require("../configs/database");
 
-exports.getList = (req, res) => {
-  client
-    .query(`SELECT * FROM fest`)
-    .then((data) => {
-      const festData = data.rows;
+exports.getList = async (req, res) => {
+  try {
+    const data = await client.query(`SELECT * FROM fest`);
+    const festData = data.rows;
 
-      res.status(200).json({
-        data: festData,
-      });
-    })
-    .catch((err) => {
-      res.status(400).json({
-        error: `11${err}`,
-      });
+    res.status(200).json({
+      data: festData,
     });
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
 };
 
-exports.getEvents = (req, res) => {
+exports.getEvents = async (req, res) => {
   const idsArray = req.body.ids.split(",");
   var eventArray = [];
   let index = 0;
 
-  idsArray.forEach((id) => {
-    client
-      .query(`SELECT * FROM fest where fest_id='${id}'`)
-      .then((data) => {
-        let festData = data.rows[0];
+  idsArray.forEach(async (id) => {
+    try {
+      const data = await client.query(
+        `SELECT * FROM fest where fest_id='${id}'`
+      );
+      let festData = data.rows[0];
 
-        eventArray[index] = festData;
-        index++;
+      eventArray[index] = festData;
+      index++;
 
-        if (index == idsArray.length) {
-          res.status(200).json({
-            data: eventArray,
-          });
-        }
-      })
-      .catch((err) => {
-        res.status(400).json({
-          error: `1${err}`,
+      if (index == idsArray.length) {
+        res.status(200).json({
+          data: eventArray,
         });
+      }
+    } catch (err) {
+      res.status(400).json({
+        error: `1${err}`,
       });
+    }
   });
 };
 

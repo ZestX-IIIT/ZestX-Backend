@@ -15,33 +15,21 @@ var transporter = nodemailer.createTransport({
   },
 });
 
-exports.getDetails = (req, res) => {
-  client
-    .query(`SELECT * FROM users where email = '${req.email}'`)
-    .then((data) => {
-      const userData = data.rows;
+exports.getDetails = async (req, res) => {
+  try {
+    const data = await client.query(
+      `SELECT * FROM users where user_id = '${req.userId}'`
+    );
+    const userData = data.rows[0];
 
-      const filteredData = userData.map((item) => {
-        return {
-          userId: item.user_id,
-          userName: item.user_name,
-          email: item.email,
-          mobile: item.mobile,
-          festIds: item.fest_id,
-          isAdmin: item.is_admin,
-          isVerified: item.is_verified,
-        };
-      });
-
-      res.status(200).json({
-        data: filteredData,
-      });
-    })
-    .catch((err) => {
-      res.status(400).json({
-        error: `44${err}`,
-      });
+    res.status(200).json({
+      data: userData,
     });
+  } catch (err) {
+    res.status(400).json({
+      error: `4${err}`,
+    });
+  }
 };
 
 exports.updateDetails = (req, res) => {
@@ -51,106 +39,100 @@ exports.updateDetails = (req, res) => {
   const { user_name, email, password, mobile } = req.body;
 
   if (userEmail == email) {
-    bcrypt.hash(password, 10, (err, hash) => {
+    bcrypt.hash(password, 10, async (err, hash) => {
       if (err) {
         res.status(500).json({
-          error: "Internal server error",
+          error: `1${err}`,
         });
       } else {
-        client
-          .query(
+        try {
+          await client.query(
             `UPDATE users SET user_name='${user_name}', password='${hash}', mobile='${mobile}' where email='${userEmail}'`
-          )
-          .then((data) => {
-            res.status(200).json({
-              message: "updated successfully!",
-              data: `${data}`,
-            });
-          })
-          .catch((err2) => {
-            res.status(400).json({
-              error: `22${err2}`,
-            });
+          );
+
+          res.status(200).json({
+            message: "details updated successfully!",
           });
+        } catch (err1) {
+          res.status(400).json({
+            error: `2${err1}`,
+          });
+        }
       }
     });
   } else {
-    bcrypt.hash(password, 10, (err3, hash) => {
-      if (err3) {
+    bcrypt.hash(password, 10, async (err2, hash) => {
+      if (err2) {
         res.status(500).json({
-          error: `33${err3}`,
+          error: `3${err2}`,
         });
       } else {
-        client
-          .query(
+        try {
+          await client.query(
             `UPDATE users SET user_name='${user_name}', email='${email}', password='${hash}', mobile='${mobile}', is_verified='${boolvalue}' where user_id='${userId}'`
-          )
-          .then((data) => {
-            const token = jwt.sign(
-              {
-                email: email,
-                userId: userId,
-              },
-              "" + process.env.SECRET_KEY
-            );
-            var link = baseurl_for_user_verification + token;
+          );
+          const token = jwt.sign(
+            {
+              email: email,
+              userId: userId,
+            },
+            "" + process.env.SECRET_KEY
+          );
+          var link = baseurl_for_user_verification + token;
 
-            var mailOptions = {
-              from: "verify.zestx@gmail.com",
-              to: `${email}`,
-              subject: "Confirmation mail",
-              html: `click <a href=${link}>here</a> to confirm your mail`,
-            };
+          var mailOptions = {
+            from: "verify.zestx@gmail.com",
+            to: `${email}`,
+            subject: "Confirmation mail",
+            html: `click <a href=${link}>here</a> to confirm your mail`,
+          };
 
-            transporter.sendMail(mailOptions, function (error, info) {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log("Email sent: " + info.response);
-              }
-            });
-            res.status(222).json({
-              message: "updated successfully!",
-              token: `${token}`,
-            });
-          })
-          .catch((err1) => {
-            res.status(400).json({
-              error: `11${err1}`,
-            });
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log("Email sent: " + info.response);
+            }
           });
+          res.status(222).json({
+            message: "details updated successfully!",
+            token: `${token}`,
+          });
+        } catch (err3) {
+          res.status(400).json({
+            error: `4${err3}`,
+          });
+        }
       }
     });
   }
 };
 
-exports.verifyUser = (req, res) => {
-  const userToken = req.userId;
+exports.verifyUser = async (req, res) => {
+  const userToken = req.userToken;
 
-  var userEmail = jwt.decode(userToken).email;
+  var userId = jwt.decode(userToken).userId;
   var boolvalue = true;
 
-  client
-    .query(
-      `UPDATE users SET is_verified=${boolvalue} where email='${userEmail}'`
-    )
-    .then((data) => {
-      var options = {
-        root: path.join(__dirname),
-      };
+  try {
+    await client.query(
+      `UPDATE users SET is_verified=${boolvalue} where user_id='${userId}'`
+    );
+    var options = {
+      root: path.join(__dirname),
+    };
 
-      var fileName = "user_verified.html";
-      res.status(200).sendFile(fileName, options, function (err) {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log("Sent:", fileName);
-        }
-      });
-    })
-    .catch((err2) => {
-      res.status(400).json({
-        error: `${err2}`,
-      });
+    var fileName = "user_verified.html";
+    res.status(200).sendFile(fileName, options, function (err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("Sent:", fileName);
+      }
     });
+  } catch (err) {
+    res.status(400).json({
+      error: `${err2}`,
+    });
+  }
 };
