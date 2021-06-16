@@ -21,7 +21,7 @@ exports.getEvents = async (req, res) => {
   let index = 0;
 
   try {
-    idsArray.forEach(async (id) => {
+    for (const id of idsArray) {
       const data = await client.query(
         `SELECT * FROM fest where fest_id='${id}'`
       );
@@ -29,19 +29,16 @@ exports.getEvents = async (req, res) => {
 
       eventArray[index] = festData;
       index++;
-    })
+    }
     res.status(200).json({
       data: eventArray,
     });
-
   } catch (err) {
     res.status(400).json({
       error: `1${err}`,
     });
-  };
-
+  }
 };
-
 
 exports.register = async (req, res) => {
   const eventId = req.body.id;
@@ -265,10 +262,10 @@ function isEligible2(userData, festId) {
   return true;
 }
 
-function isEligible3(userData) {
+exports.isEligible3 = (userData) => {
   const boolvalue = userData.rows[0].is_admin;
 
   if (!boolvalue) return false;
 
   return true;
-}
+};

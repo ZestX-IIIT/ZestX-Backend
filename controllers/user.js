@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 var nodemailer = require("nodemailer");
+const { isEligible3 } = require("./fest");
 const baseurl_for_user_verification =
   "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
@@ -32,46 +33,77 @@ exports.getDetails = async (req, res) => {
   }
 };
 
-exports.getuserdetailsbyids = async (req, res) => {
-  // try {
-  //   const data = await client.query(
-  //     `SELECT * FROM users where user_id = '${req.userId}'`
-  //   );
-  //   const userData = data.rows[0];
-
-  //   res.status(200).json({
-  //     data: userData,
-  //   });
-  // } catch (err) {
-  //   res.status(400).json({
-  //     error: `4${err}`,
-  //   });
-  // }
+exports.userDetails = async (req, res) => {
+  const adminEmail = req.email;
 
   const idsArray = req.body.ids.split(",");
   var usersArray = [];
   let index = 0;
-
   try {
-    idsArray.forEach(async (id) => {
-      const data = await client.query(
-        `SELECT * FROM users where user_id = '${id}'`
-      );
-      const userData = data.rows[0];
-      usersArray[index] = userData;
-      index++;
-    })
-    res.status(200).json({
-      data: usersArray,
-    });
+    const data1 = await client.query(
+      `SELECT * FROM users where email = '${adminEmail}'`
+    );
 
+    if (isEligible3(data1)) {
+      for (const id of idsArray) {
+        const data = await client.query(
+          `SELECT * FROM users where user_id = '${id}'`
+        );
+        let userData = data.rows[0];
+
+        usersArray[index] = userData;
+        index++;
+      }
+      res.status(200).json({
+        data: usersArray,
+      });
+    } else {
+      res.status(400).json({
+        err: "You have no access!",
+      });
+    }
   } catch (err) {
     res.status(400).json({
       error: `1${err}`,
     });
-  };
+  }
 };
 
+exports.exUserDetails = async (req, res) => {
+  const adminEmail = req.email;
+
+  const idsArray = req.body.ids.split(",");
+  var usersArray = [];
+  let index = 0;
+  try {
+    const data1 = await client.query(
+      `SELECT * FROM users where email = '${adminEmail}'`
+    );
+
+    if (isEligible3(data1)) {
+      for (const id of idsArray) {
+        const data = await client.query(
+          `SELECT * FROM external_users where userid = '${id}'`
+        );
+        let userData = data.rows[0];
+
+        usersArray[index] = userData;
+        index++;
+      }
+      res.status(200).json({
+        data: usersArray,
+      });
+    } else {
+      res.status(400).json({
+        err: "You have no access!",
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
+};
 
 exports.updateDetails = (req, res) => {
   const boolvalue = false;
