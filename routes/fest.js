@@ -7,6 +7,7 @@ const {
   ongoingEvents,
   addUser,
   removeUser,
+  removeExternalUser,
 } = require("../controllers/fest");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const router = express.Router();
@@ -18,5 +19,6 @@ router.post("/getevents", verifyToken, getEvents);
 router.get("/ongoingevents", ongoingEvents);
 router.post("/adduser", verifyToken, addUser);
 router.post("/removeuser", verifyToken, removeUser);
+router.post("/removeexuser", verifyToken, removeExternalUser);
 
 module.exports = router;

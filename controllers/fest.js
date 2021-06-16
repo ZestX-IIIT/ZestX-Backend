@@ -178,7 +178,62 @@ exports.addUser = async (req, res) => {
 };
 
 exports.removeUser = async (req, res) => {
+  const adminEmail = req.email;
+  const { userId, eventId } = req.body;
   try {
+    const data1 = await client.query(
+      `SELECT * FROM users where email = '${adminEmail}'`
+    );
+
+    if (isEligible3(data1)) {
+      await client.query(
+        `UPDATE users SET fest_id = array_remove(fest_id, '${eventId}') WHERE user_id='${userId}';`
+      );
+
+      await client.query(
+        `UPDATE fest SET user_id= array_remove(user_id, '${userId}') WHERE fest_id='${eventId}';`
+      );
+
+      res.status(200).json({
+        message: "user removed successfully!",
+      });
+    } else {
+      res.status(400).json({
+        err: "You have no access!",
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  }
+};
+
+exports.removeExternalUser = async (req, res) => {
+  const adminEmail = req.email;
+  const { userId, eventId } = req.body;
+  try {
+    const data1 = await client.query(
+      `SELECT * FROM users where email = '${adminEmail}'`
+    );
+
+    if (isEligible3(data1)) {
+      await client.query(
+        `DELETE from external_users where userid = '${userId}';`
+      );
+
+      await client.query(
+        `UPDATE fest SET external_user_id= array_remove(external_user_id, '${userId}') WHERE fest_id='${eventId}';`
+      );
+
+      res.status(200).json({
+        message: "user removed successfully!",
+      });
+    } else {
+      res.status(400).json({
+        err: "You have no access!",
+      });
+    }
   } catch (err) {
     res.status(400).json({
       error: `1${err}`,
