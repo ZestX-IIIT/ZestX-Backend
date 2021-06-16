@@ -32,6 +32,47 @@ exports.getDetails = async (req, res) => {
   }
 };
 
+exports.getuserdetailsbyids = async (req, res) => {
+  // try {
+  //   const data = await client.query(
+  //     `SELECT * FROM users where user_id = '${req.userId}'`
+  //   );
+  //   const userData = data.rows[0];
+
+  //   res.status(200).json({
+  //     data: userData,
+  //   });
+  // } catch (err) {
+  //   res.status(400).json({
+  //     error: `4${err}`,
+  //   });
+  // }
+
+  const idsArray = req.body.ids.split(",");
+  var usersArray = [];
+  let index = 0;
+
+  try {
+    idsArray.forEach(async (id) => {
+      const data = await client.query(
+        `SELECT * FROM users where user_id = '${id}'`
+      );
+      const userData = data.rows[0];
+      usersArray[index] = userData;
+      index++;
+    })
+    res.status(200).json({
+      data: usersArray,
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  };
+};
+
+
 exports.updateDetails = (req, res) => {
   const boolvalue = false;
   const userEmail = req.email;
