@@ -20,6 +20,38 @@ exports.getEvents = async (req, res) => {
   var eventArray = [];
   let index = 0;
 
+
+  try {
+    idsArray.forEach(async (id) => {
+      const data = await client.query(
+        `SELECT * FROM fest where fest_id='${id}'`
+      );
+      let festData = data.rows[0];
+
+      eventArray[index] = festData;
+      index++;
+    })
+    res.status(200).json({
+      data: eventArray,
+    });
+
+  } catch (err) {
+    res.status(400).json({
+      error: `1${err}`,
+    });
+  };
+
+
+
+
+};
+
+
+exports.getEvents = async (req, res) => {
+  const idsArray = req.body.ids.split(",");
+  var eventArray = [];
+  let index = 0;
+
   idsArray.forEach(async (id) => {
     try {
       const data = await client.query(
