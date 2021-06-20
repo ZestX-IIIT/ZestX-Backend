@@ -245,6 +245,7 @@ function isEligible(userData, festId) {
 
   const festIdsList = userData.rows[0].fest_id;
 
+  if (festIdsList == null) return true;
   if (festIdsList.includes(festId)) return false;
 
   return true;
@@ -257,6 +258,7 @@ function isEligible2(userData, festId) {
 
   const festIdsList = userData.rows[0].fest_id;
 
+  if (festIdsList == null) return false;
   if (!festIdsList.includes(festId)) return false;
 
   return true;
