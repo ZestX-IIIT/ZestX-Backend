@@ -27,7 +27,7 @@ exports.getDetails = async (req, res) => {
       data: userData,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `4${err}`,
     });
   }
@@ -63,7 +63,7 @@ exports.userDetails = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -99,7 +99,7 @@ exports.exUserDetails = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -204,7 +204,7 @@ exports.verifyUser = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `${err2}`,
     });
   }

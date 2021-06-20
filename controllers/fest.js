@@ -9,7 +9,7 @@ exports.getList = async (req, res) => {
       data: festData,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -34,7 +34,7 @@ exports.getEvents = async (req, res) => {
       data: eventArray,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -67,7 +67,7 @@ exports.register = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -100,7 +100,7 @@ exports.unregister = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -130,7 +130,7 @@ exports.ongoingEvents = async (req, res) => {
       data: eventArray,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -168,7 +168,7 @@ exports.addUser = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -200,7 +200,7 @@ exports.removeUser = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }
@@ -232,7 +232,7 @@ exports.removeExternalUser = async (req, res) => {
       });
     }
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       error: `1${err}`,
     });
   }

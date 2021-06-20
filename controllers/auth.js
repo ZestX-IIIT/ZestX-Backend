@@ -82,7 +82,7 @@ exports.signUp = async (req, res) => {
       });
     }
   } catch (err1) {
-    res.status(400).json({
+    res.status(501).json({
       error: `1${err1}`,
     });
   }
@@ -123,14 +123,14 @@ exports.signIn = async (req, res) => {
             token: token,
           });
         } else {
-          res.status(400).json({
+          res.status(401).json({
             error: "Enter correct password!",
           });
         }
       });
     }
   } catch (err1) {
-    res.status(400).json({
+    res.status(501).json({
       error: `1${err1}`,
     });
   }
