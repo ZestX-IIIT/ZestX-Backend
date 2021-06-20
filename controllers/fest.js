@@ -246,22 +246,18 @@ function isEligible(userData, festId) {
   const festIdsList = userData.rows[0].fest_id;
 
   if (festIdsList == null) return true;
-  if (festIdsList.includes(festId)) return false;
+  if (festIdsList.includes(`${festId}`)) return false;
 
   return true;
 }
 
 function isEligible2(userData, festId) {
-  const boolvalue = userData.rows[0].is_verified;
-
-  if (!boolvalue) return false;
-
   const festIdsList = userData.rows[0].fest_id;
 
   if (festIdsList.length == 0) return false;
-  if (!festIdsList.includes(festId)) return false;
+  if (festIdsList.includes(`${festId}`)) return true;
 
-  return true;
+  return false;
 }
 
 exports.isEligible3 = (userData) => {
