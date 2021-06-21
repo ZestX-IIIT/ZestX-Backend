@@ -13,7 +13,7 @@ const router = express.Router();
 router.param("userToken", userIdParam);
 
 router.get("/getdetails", verifyToken, getDetails);
-router.post("/updatedetails", verifyToken, updateDetails);
+router.put("/updatedetails", verifyToken, updateDetails);
 router.post("/userdetails", verifyToken, userDetails);
 router.post("/exuserdetails", verifyToken, exUserDetails);
 router.get("/verifyuser/:userToken", verifyUser);
