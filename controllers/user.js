@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 var nodemailer = require("nodemailer");
-const { isEligible3 } = require("./fest");
 const baseurl_for_user_verification =
   "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
@@ -208,4 +207,12 @@ exports.verifyUser = async (req, res) => {
       error: `${err2}`,
     });
   }
+};
+
+function isEligible3(userData) {
+  const boolvalue = userData.rows[0].is_admin;
+
+  if (!boolvalue) return false;
+
+  return true;
 };

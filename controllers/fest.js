@@ -260,7 +260,7 @@ function isEligible2(userData, festId) {
   return false;
 }
 
-exports.isEligible3 = (userData) => {
+function isEligible3(userData) {
   const boolvalue = userData.rows[0].is_admin;
 
   if (!boolvalue) return false;
