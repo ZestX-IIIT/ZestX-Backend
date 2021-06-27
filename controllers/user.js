@@ -15,6 +15,37 @@ var transporter = nodemailer.createTransport({
   },
 });
 
+exports.changePassword = async (req, res) => {
+  const userId = req.userId;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const data = await client.query(`SELECT * FROM users WHERE user_id='${userId}'`);
+
+    bcrypt.compare(oldPassword, data.rows[0].password, function (err, result) {
+      if (result) {
+        bcrypt.hash(newPassword, 10, async function (err, hash) {
+          await client.query(
+            `UPDATE users SET password='${hash}' where user_id='${userId}'`
+          );
+
+          res.status(200).json({
+            message: "password updated successfully!",
+          });
+        });
+      } else {
+        res.status(400).json({
+          message: "Incorrect password!",
+        });
+      }
+    });
+  } catch (err1) {
+    res.status(500).json({
+      error: `${err1}`,
+    });
+  }
+}
+
 exports.getDetails = async (req, res) => {
   try {
     const data = await client.query(
@@ -27,7 +58,7 @@ exports.getDetails = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      error: `4${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -63,7 +94,7 @@ exports.userDetails = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -99,49 +130,40 @@ exports.exUserDetails = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
 
-exports.updateDetails = (req, res) => {
+exports.updateDetails = async (req, res) => {
   const boolvalue = false;
   const userEmail = req.email;
   const userId = req.userId;
   const { user_name, email, password, mobile } = req.body;
+  try {
+    const data = await client.query(`SELECT * FROM users WHERE user_id='${userId}'`);
 
-  if (userEmail == email) {
-    bcrypt.hash(password, 10, async (err, hash) => {
-      if (err) {
-        res.status(500).json({
-          error: `1${err}`,
-        });
-      } else {
-        try {
+    if (userEmail == email) {
+      bcrypt.compare(password, data.rows[0].password, async function (err, result) {
+        if (result) {
           await client.query(
-            `UPDATE users SET user_name='${user_name}', password='${hash}', mobile='${mobile}' where email='${userEmail}'`
+            `UPDATE users SET user_name='${user_name}', mobile='${mobile}' where user_id='${userId}'`
           );
 
           res.status(200).json({
             message: "details updated successfully!",
           });
-        } catch (err1) {
+        } else {
           res.status(400).json({
-            error: `2${err1}`,
+            message: "Incorrect password!",
           });
         }
-      }
-    });
-  } else {
-    bcrypt.hash(password, 10, async (err2, hash) => {
-      if (err2) {
-        res.status(500).json({
-          error: `3${err2}`,
-        });
-      } else {
-        try {
+      });
+    } else {
+      bcrypt.compare(password, data.rows[0].password, async function (err, result) {
+        if (result) {
           await client.query(
-            `UPDATE users SET user_name='${user_name}', email='${email}', password='${hash}', mobile='${mobile}', is_verified='${boolvalue}' where user_id='${userId}'`
+            `UPDATE users SET user_name='${user_name}', email='${email}', mobile='${mobile}', is_verified='${boolvalue}' where user_id='${userId}'`
           );
           const token = jwt.sign(
             {
@@ -170,12 +192,16 @@ exports.updateDetails = (req, res) => {
             message: "details updated successfully!",
             token: `${token}`,
           });
-        } catch (err3) {
+        } else {
           res.status(400).json({
-            error: `4${err3}`,
+            message: "Incorrect password!",
           });
         }
-      }
+      });
+    }
+  } catch (err1) {
+    res.status(500).json({
+      error: `${err1}`,
     });
   }
 };
