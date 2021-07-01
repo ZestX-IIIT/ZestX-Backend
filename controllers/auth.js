@@ -30,59 +30,49 @@ exports.signUp = async (req, res) => {
       });
     } else {
       bcrypt.hash(password, 10, async (err, hash) => {
-        if (err) {
-          res.status(500).json({
-            error: `${err}`,
-          });
-        } else {
-          const user = {
-            username: user_name,
-            email,
-            password: hash,
-            mobile,
-          };
+        const user = {
+          username: user_name,
+          email,
+          password: hash,
+          mobile,
+        };
 
-          await client.query(
-            `INSERT INTO users (user_name, email, password, mobile, is_verified, is_admin) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false, false);`
-          );
-          const data1 = await client.query(
-            `SELECT * FROM users where email = '${user.email}'`
-          );
-          const userId = data1.rows[0].user_id;
+        await client.query(
+          `INSERT INTO users (user_name, email, password, mobile, is_verified, is_admin) VALUES ('${user.username}', '${user.email}', '${user.password}', '${user.mobile}', false, false);`
+        );
+        const data1 = await client.query(
+          `SELECT * FROM users where email = '${user.email}'`
+        );
+        const userId = data1.rows[0].user_id;
 
-          const token = jwt.sign(
-            {
-              email: email,
-              userId: userId,
-            },
-            "" + process.env.SECRET_KEY
-          );
+        const token = jwt.sign(
+          {
+            email: email,
+            userId: userId,
+          },
+          "" + process.env.SECRET_KEY
+        );
 
-          var link = baseurl_for_user_verification + token;
+        var link = baseurl_for_user_verification + token;
 
-          var mailOptions = {
-            from: "verify.zestx@gmail.com",
-            to: `${user.email}`,
-            subject: "Confirmation mail",
-            html: `click <a href=${link}>here</a> to confirm your mail`,
-          };
+        var mailOptions = {
+          from: "verify.zestx@gmail.com",
+          to: `${user.email}`,
+          subject: "Confirmation mail",
+          html: `click <a href=${link}>here</a> to confirm your mail`,
+        };
 
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Email sent: " + info.response);
-            }
-          });
-          res.status(200).json({
-            message: "User added successfully",
-            data: `${token}`,
-          });
-        }
+        transporter.sendMail(mailOptions, function (error, info) {
+          console.log("Email sent: " + info.response);
+        });
+        res.status(200).json({
+          message: "User added successfully",
+          data: `${token}`,
+        });
       });
     }
   } catch (err1) {
-    res.status(501).json({
+    res.status(500).json({
       error: `1${err1}`,
     });
   }
@@ -105,11 +95,7 @@ exports.signIn = async (req, res) => {
     } else {
       const userId = data.rows[0].user_id;
       bcrypt.compare(password, userData[0].password, (err, result) => {
-        if (err) {
-          res.status(500).json({
-            error: `${err}`,
-          });
-        } else if (result) {
+        if (result) {
           const token = jwt.sign(
             {
               email: email,
@@ -123,14 +109,14 @@ exports.signIn = async (req, res) => {
             token: token,
           });
         } else {
-          res.status(401).json({
+          res.status(444).json({
             error: "Enter correct password!",
           });
         }
       });
     }
   } catch (err1) {
-    res.status(501).json({
+    res.status(500).json({
       error: `1${err1}`,
     });
   }

@@ -73,7 +73,7 @@ exports.forgotPasswordForSignIn = async (req, res) => {
       var mailOptions = {
         from: "verify.zestx@gmail.com",
         to: `${userEmail}`,
-        subject: "Forgot Password",
+        subject: "New Password",
         html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
       };
 
@@ -260,11 +260,7 @@ exports.updateDetails = async (req, res) => {
           };
 
           transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log("Email sent: " + info.response);
-            }
+            console.log("Email sent: " + info.response);
           });
           res.status(222).json({
             message: "details updated successfully!",
