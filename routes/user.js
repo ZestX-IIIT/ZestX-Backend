@@ -6,6 +6,8 @@ const {
   userDetails,
   exUserDetails,
   changePassword,
+  forgotPasswordForSignIn,
+  forgotPasswordForHomepage,
 } = require("../controllers/user");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const { userIdParam } = require("../middlewares/userMiddleware");
@@ -18,6 +20,8 @@ router.post("/updatedetails", verifyToken, updateDetails);
 router.post("/userdetails", verifyToken, userDetails);
 router.post("/exuserdetails", verifyToken, exUserDetails);
 router.post("/changepassword", verifyToken, changePassword);
+router.post("/forgotpasswordsignin", forgotPasswordForSignIn);
+router.get("/forgotpasswordhomepage", verifyToken, forgotPasswordForHomepage);
 router.get("/verifyuser/:userToken", verifyUser);
 
 module.exports = router;
