@@ -11,7 +11,7 @@ var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "verify.zestx@gmail.com",
-    pass: "opznfpdfkndofxre",
+    pass: process.env.VERIFY_PASSWORD,
   },
 });
 
@@ -73,7 +73,7 @@ exports.signUp = async (req, res) => {
     }
   } catch (err1) {
     res.status(500).json({
-      error: `1${err1}`,
+      error: `${err1}`,
     });
   }
 };
@@ -117,7 +117,7 @@ exports.signIn = async (req, res) => {
     }
   } catch (err1) {
     res.status(500).json({
-      error: `1${err1}`,
+      error: `${err1}`,
     });
   }
 };

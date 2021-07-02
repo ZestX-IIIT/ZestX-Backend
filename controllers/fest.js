@@ -10,7 +10,7 @@ exports.getList = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -35,7 +35,7 @@ exports.getEvents = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -68,7 +68,7 @@ exports.register = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -101,7 +101,7 @@ exports.unregister = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -131,7 +131,7 @@ exports.ongoingEvents = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -169,7 +169,7 @@ exports.addUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -201,7 +201,7 @@ exports.removeUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };
@@ -233,7 +233,7 @@ exports.removeExternalUser = async (req, res) => {
     }
   } catch (err) {
     res.status(500).json({
-      error: `1${err}`,
+      error: `${err}`,
     });
   }
 };

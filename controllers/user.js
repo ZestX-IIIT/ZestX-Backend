@@ -2,6 +2,7 @@ const client = require("../configs/database");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+require('dotenv').config();
 
 var nodemailer = require("nodemailer");
 const baseurl_for_user_verification =
@@ -11,7 +12,7 @@ var supporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "help.zestx@gmail.com",
-    pass: "wtaansrahyphaviw",
+    pass: process.env.HELP_PASSWORD,
   },
 });
 
@@ -19,7 +20,7 @@ var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "verify.zestx@gmail.com",
-    pass: "opznfpdfkndofxre",
+    pass: process.env.VERIFY_PASSWORD,
   },
 });
 
