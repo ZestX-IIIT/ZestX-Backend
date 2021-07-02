@@ -7,6 +7,14 @@ var nodemailer = require("nodemailer");
 const baseurl_for_user_verification =
   "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
+var supporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "help.zestx@gmail.com",
+    pass: "wtaansrahyphaviw",
+  },
+});
+
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -28,13 +36,13 @@ exports.forgotPasswordForHomepage = (req, res) => {
       );
     });
     var mailOptions = {
-      from: "verify.zestx@gmail.com",
+      from: "help.zestx@gmail.com",
       to: `${userEmail}`,
       subject: "Forgot Password",
       html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
     };
 
-    transporter.sendMail(mailOptions, function (error, info) {
+    supporter.sendMail(mailOptions, function (error, info) {
       console.log("Email sent: " + info.response);
     });
 
@@ -71,13 +79,13 @@ exports.forgotPasswordForSignIn = async (req, res) => {
         );
       });
       var mailOptions = {
-        from: "verify.zestx@gmail.com",
+        from: "help.zestx@gmail.com",
         to: `${userEmail}`,
         subject: "New Password",
         html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
       };
 
-      transporter.sendMail(mailOptions, function (error, info) {
+      supporter.sendMail(mailOptions, function (error, info) {
         console.log("Email sent: " + info.response);
       });
 
