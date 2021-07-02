@@ -16,7 +16,6 @@ app.use(cors());
 
 app.get("/", (req, res) => {
     res.status(200).send(`server responding correctly...`);
-
 });
 
 app.use("/auth", authRoutes);
