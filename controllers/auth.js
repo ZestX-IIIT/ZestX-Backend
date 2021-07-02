@@ -15,6 +15,91 @@ var transporter = nodemailer.createTransport({
   },
 });
 
+var supporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "help.zestx@gmail.com",
+    pass: process.env.HELP_PASSWORD,
+  },
+});
+
+exports.forgotPasswordForHomepage = (req, res) => {
+
+  let userEmail = req.email;
+  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+  let passwordString = password.toString();
+
+  try {
+    bcrypt.hash(passwordString, 10, async function (err, hash) {
+      await client.query(
+        `UPDATE users SET password='${hash}' where email='${userEmail}'`
+      );
+    });
+    var mailOptions = {
+      from: "help.zestx@gmail.com",
+      to: `${userEmail}`,
+      subject: "Forgot Password",
+      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
+    };
+
+    supporter.sendMail(mailOptions, function (error, info) {
+      console.log("Email sent: " + info.response);
+    });
+
+    res.status(200).json({
+      message: "new password sent successfully!",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: `${error}`,
+    });
+  }
+
+}
+
+exports.forgotPasswordForSignIn = async (req, res) => {
+
+  let userEmail = req.body.email;
+  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+  let passwordString = password.toString();
+
+  try {
+    const data = await client.query(
+      `SELECT * FROM users WHERE email='${userEmail}'`
+    );
+    if (data.rows.length == 0) {
+      res.status(400).json({
+        message: "Enter valid email-id!",
+      });
+    } else {
+      bcrypt.hash(passwordString, 10, async function (err, hash) {
+        await client.query(
+          `UPDATE users SET password='${hash}' where email='${userEmail}'`
+        );
+      });
+      var mailOptions = {
+        from: "help.zestx@gmail.com",
+        to: `${userEmail}`,
+        subject: "New Password",
+        html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
+      };
+
+      supporter.sendMail(mailOptions, function (error, info) {
+        console.log("Email sent: " + info.response);
+      });
+
+      res.status(200).json({
+        message: "new password sent successfully!",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: `${error}`,
+    });
+  }
+}
+
 exports.signUp = async (req, res) => {
   const { user_name, email, password, mobile } = req.body;
 
