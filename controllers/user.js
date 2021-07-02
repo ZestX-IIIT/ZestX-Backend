@@ -8,14 +8,6 @@ var nodemailer = require("nodemailer");
 const baseurl_for_user_verification =
   "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
-var supporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "help.zestx@gmail.com",
-    pass: process.env.HELP_PASSWORD,
-  },
-});
-
 var transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -23,84 +15,6 @@ var transporter = nodemailer.createTransport({
     pass: process.env.VERIFY_PASSWORD,
   },
 });
-
-exports.forgotPasswordForHomepage = (req, res) => {
-
-  let userEmail = req.email;
-  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-  let passwordString = password.toString();
-
-  try {
-    bcrypt.hash(passwordString, 10, async function (err, hash) {
-      await client.query(
-        `UPDATE users SET password='${hash}' where email='${userEmail}'`
-      );
-    });
-    var mailOptions = {
-      from: "help.zestx@gmail.com",
-      to: `${userEmail}`,
-      subject: "Forgot Password",
-      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
-    };
-
-    supporter.sendMail(mailOptions, function (error, info) {
-      console.log("Email sent: " + info.response);
-    });
-
-    res.status(200).json({
-      message: "new password sent successfully!",
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      error: `${error}`,
-    });
-  }
-
-}
-
-exports.forgotPasswordForSignIn = async (req, res) => {
-
-  let userEmail = req.body.email;
-  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-  let passwordString = password.toString();
-
-  try {
-    const data = await client.query(
-      `SELECT * FROM users WHERE email='${userEmail}'`
-    );
-    if (data.rows.length == 0) {
-      res.status(400).json({
-        message: "Enter valid email-id!",
-      });
-    } else {
-      bcrypt.hash(passwordString, 10, async function (err, hash) {
-        await client.query(
-          `UPDATE users SET password='${hash}' where email='${userEmail}'`
-        );
-      });
-      var mailOptions = {
-        from: "help.zestx@gmail.com",
-        to: `${userEmail}`,
-        subject: "New Password",
-        html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
-      };
-
-      supporter.sendMail(mailOptions, function (error, info) {
-        console.log("Email sent: " + info.response);
-      });
-
-      res.status(200).json({
-        message: "new password sent successfully!",
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      error: `${error}`,
-    });
-  }
-
-}
 
 exports.changePassword = async (req, res) => {
   const userId = req.userId;
@@ -143,78 +57,6 @@ exports.getDetails = async (req, res) => {
     res.status(200).json({
       data: userData,
     });
-  } catch (err) {
-    res.status(500).json({
-      error: `${err}`,
-    });
-  }
-};
-
-exports.userDetails = async (req, res) => {
-  const adminEmail = req.email;
-
-  const idsArray = req.body.ids.split(",");
-  var usersArray = [];
-  let index = 0;
-  try {
-    const data1 = await client.query(
-      `SELECT * FROM users where email = '${adminEmail}'`
-    );
-
-    if (isEligible3(data1)) {
-      for (const id of idsArray) {
-        const data = await client.query(
-          `SELECT * FROM users where user_id = '${id}'`
-        );
-        let userData = data.rows[0];
-
-        usersArray[index] = userData;
-        index++;
-      }
-      res.status(200).json({
-        data: usersArray,
-      });
-    } else {
-      res.status(400).json({
-        err: "You have no access!",
-      });
-    }
-  } catch (err) {
-    res.status(500).json({
-      error: `${err}`,
-    });
-  }
-};
-
-exports.exUserDetails = async (req, res) => {
-  const adminEmail = req.email;
-
-  const idsArray = req.body.ids.split(",");
-  var usersArray = [];
-  let index = 0;
-  try {
-    const data1 = await client.query(
-      `SELECT * FROM users where email = '${adminEmail}'`
-    );
-
-    if (isEligible3(data1)) {
-      for (const id of idsArray) {
-        const data = await client.query(
-          `SELECT * FROM external_users where userid = '${id}'`
-        );
-        let userData = data.rows[0];
-
-        usersArray[index] = userData;
-        index++;
-      }
-      res.status(200).json({
-        data: usersArray,
-      });
-    } else {
-      res.status(400).json({
-        err: "You have no access!",
-      });
-    }
   } catch (err) {
     res.status(500).json({
       error: `${err}`,
@@ -318,10 +160,3 @@ exports.verifyUser = async (req, res) => {
   }
 };
 
-function isEligible3(userData) {
-  const boolvalue = userData.rows[0].is_admin;
-
-  if (!boolvalue) return false;
-
-  return true;
-};
