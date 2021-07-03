@@ -18,23 +18,25 @@ exports.verifyAdmin = (req, res, next) => {
                 const data = await client
                     .query(`SELECT * FROM users where user_id = '${userId}'`);
 
-                if (data.rows.length == 0) {
-                    res.status(400).json({
+                if (data.rows.length == 0)
+                    return res.status(400).json({
                         message: "Invalid email or password!",
                     });
-                } else {
-                    if (!(data.rows[0].is_admin)) return;
-                    req.email = userEmail;
-                    req.userId = userId;
-                    next();
-                }
+
+                if (!(data.rows[0].is_admin))
+                    return res.status(400).json({
+                        message: "Unauthorized admin!",
+                    });
+                req.email = userEmail;
+                req.userId = userId;
+                next();
+
 
             } catch (err1) {
-                res.status(500).json({
+                return res.status(500).json({
                     message: `${err1}`,
                 });
             }
-
         });
     }
 };

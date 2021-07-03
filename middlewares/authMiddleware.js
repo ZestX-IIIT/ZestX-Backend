@@ -18,18 +18,17 @@ exports.verifyToken = (req, res, next) => {
         const data = await client
           .query(`SELECT * FROM users where user_id = '${userId}'`);
 
-        if (data.rows.length == 0) {
-          res.status(400).json({
+        if (data.rows.length == 0)
+          return res.status(400).json({
             message: "Invalid email or password",
           });
-        } else {
-          req.email = userEmail;
-          req.userId = userId;
-          next();
-        }
+
+        req.email = userEmail;
+        req.userId = userId;
+        next();
 
       } catch (err1) {
-        res.status(500).json({
+        return res.status(500).json({
           message: `${err1}`,
         });
       }
