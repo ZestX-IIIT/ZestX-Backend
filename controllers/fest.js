@@ -30,11 +30,11 @@ exports.register = async (req, res) => {
       });
 
     await client.query(
-      "UPDATE users SET fest_id = fest_id || '{$1}' where user_id=$2", [eventId, userId]
+      `UPDATE users SET fest_id = fest_id || '{${eventId}}' where user_id=$1`, [userId]
     );
 
     await client.query(
-      "UPDATE fest SET user_id = user_id || '{$1}' where fest_id=$2", [userId, eventId]
+      `UPDATE fest SET user_id = user_id || '{${userId}}' where fest_id=$1`, [eventId]
     );
 
     return res.status(200).json({

@@ -2,30 +2,14 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const client = require("../configs/database");
 require("dotenv").config();
-var nodemailer = require("nodemailer");
+const { transporter, supporter } = require("../configs/mailer");
 
-const baseurl_for_user_verification =
-  "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
-
-var transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "verify.zestx@gmail.com",
-    pass: process.env.VERIFY_PASSWORD,
-  },
-});
-
-var supporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "help.zestx@gmail.com",
-    pass: process.env.HELP_PASSWORD,
-  },
-});
+const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
+const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
 
 exports.forgotPasswordForHomepage = (req, res) => {
   let userEmail = req.email;
-  passwordSender(userEmail, res);
+  mailSenderToSetPassword(userEmail, res);
 }
 
 exports.forgotPasswordForSignIn = async (req, res) => {
@@ -40,7 +24,7 @@ exports.forgotPasswordForSignIn = async (req, res) => {
         message: "Enter valid email-id!",
       });
 
-    passwordSender(userEmail, res);
+    mailSenderToSetPassword(userEmail, res);
 
   } catch (error) {
     return res.status(500).json({
@@ -135,7 +119,7 @@ exports.signIn = async (req, res) => {
             email: email,
             userId: userId,
           },
-          "" + process.env.SECRET_KEY
+          process.env.SECRET_KEY
         );
 
         return res.status(200).json({
@@ -156,26 +140,30 @@ exports.signIn = async (req, res) => {
   }
 };
 
-async function passwordSender(email, res) {
-  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-  let passwordString = password.toString();
+async function mailSenderToSetPassword(email, res) {
+
   try {
-    bcrypt.hash(passwordString, 10, async function (err, hash) {
-      await client.query(
-        'UPDATE users SET password=$1 where email=$2', [hash, email]
-      );
-    });
+
+    const token = jwt.sign(
+      {
+        email: email,
+      },
+      process.env.SECRET_KEY
+    );
+
+    let link = baseurl_for_reset_password + token;
+
     let mailOptions = {
       from: "help.zestx@gmail.com",
       to: `${email}`,
       subject: "New Password",
-      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
+      html: `click <a href=${link}>here</a> to set your new password.`,
     };
 
     supporter.sendMail(mailOptions, function (error, info) {
       console.log("Email sent: " + info.response);
       return res.status(200).json({
-        message: "new password sent successfully!",
+        message: "mail sent successfully!",
       });
     });
 
