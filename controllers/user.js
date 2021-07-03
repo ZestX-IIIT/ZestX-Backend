@@ -13,23 +13,23 @@ exports.changePassword = async (req, res) => {
   try {
     const data = await client.query('SELECT * FROM users where user_id = $1', [userId]);
 
-    bcrypt.compare(oldPassword, data.rows[0].password, function (err, result) {
-      if (result)
-        bcrypt.hash(newPassword, 10, async function (err, hash) {
-          await client.query(
-            'UPDATE users SET password=$1 where user_id=$2', [hash, userId]
-          );
+    const result = await bcrypt.compare(oldPassword, data.rows[0].password);
 
-          return res.status(200).json({
-            message: "password updated successfully!",
-          });
-        });
-
+    if (!result)
       return res.status(400).json({
         message: "Incorrect password!",
       });
 
+    const hash = await bcrypt.hash(newPassword, 10);
+    await client.query(
+      'UPDATE users SET password=$1 where user_id=$2', [hash, userId]
+    );
+
+    return res.status(200).json({
+      message: "password updated successfully!",
     });
+
+
   } catch (err) {
     return res.status(500).json({
       error: `${err}`,
@@ -88,56 +88,51 @@ exports.updateDetails = async (req, res) => {
     const data = await client.query('SELECT * FROM users where user_id = $1', [userId]);
 
     if (userEmail == email) {
-      bcrypt.compare(password, data.rows[0].password, async function (err, result) {
-        if (!result)
-          return res.status(400).json({
-            message: "Incorrect password!",
-          });
-
-        await client.query(
-          'UPDATE users SET user_name=$1, mobile=$2 where user_id=$3', [user_name, mobile, userId]
-        );
-
-        return res.status(200).json({
-          message: "details updated successfully!",
+      const result = await bcrypt.compare(password, data.rows[0].password);
+      if (!result)
+        return res.status(400).json({
+          message: "Incorrect password!",
         });
 
+      await client.query(
+        'UPDATE users SET user_name=$1, mobile=$2 where user_id=$3', [user_name, mobile, userId]
+      );
+
+      return res.status(200).json({
+        message: "details updated successfully!",
       });
+
     } else {
-      bcrypt.compare(password, data.rows[0].password, async function (err, result) {
-        if (!result)
-          return res.status(400).json({
-            message: "Incorrect password!",
-          });
-
-        await client.query(
-          'UPDATE users SET user_name=$1, email=$2, mobile=$3, is_verified=$4 where user_id=$5', [user_name, email, mobile, boolvalue, userId]
-        );
-        const token = jwt.sign(
-          {
-            email: email,
-            userId: userId,
-          },
-          process.env.SECRET_KEY
-        );
-        var link = baseurl_for_user_verification + token;
-
-        var mailOptions = {
-          from: "verify.zestx@gmail.com",
-          to: `${email}`,
-          subject: "Confirmation mail",
-          html: `click <a href=${link}>here</a> to confirm your mail`,
-        };
-
-        transporter.sendMail(mailOptions, function (error, info) {
-          console.log("Email sent: " + info.response);
-        });
-        return res.status(222).json({
-          message: "details updated successfully!",
-          token: `${token}`,
+      const result = await bcrypt.compare(password, data.rows[0].password);
+      if (!result)
+        return res.status(400).json({
+          message: "Incorrect password!",
         });
 
+      await client.query(
+        'UPDATE users SET user_name=$1, email=$2, mobile=$3, is_verified=$4 where user_id=$5', [user_name, email, mobile, boolvalue, userId]
+      );
+      const token = jwt.sign(
+        {
+          email: email,
+          userId: userId,
+        },
+        process.env.SECRET_KEY
+      );
+      var link = baseurl_for_user_verification + token;
 
+      var mailOptions = {
+        from: "verify.zestx@gmail.com",
+        to: `${email}`,
+        subject: "Confirmation mail",
+        html: `click <a href=${link}>here</a> to confirm your mail`,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      return res.status(222).json({
+        message: "details updated successfully!",
+        token: `${token}`,
       });
     }
   } catch (err) {
@@ -149,7 +144,7 @@ exports.updateDetails = async (req, res) => {
 
 exports.verifyUser = async (req, res) => {
   const userToken = req.userToken;
-  var boolvalue = true;
+  let boolvalue = true;
 
   try {
     const decoded = await jwt.verify(userToken, process.env.SECRET_KEY);

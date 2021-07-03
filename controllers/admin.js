@@ -2,12 +2,10 @@ const client = require("../configs/database");
 require('dotenv').config();
 
 exports.userDetails = async (req, res) => {
-
     const idsArray = req.body.ids.split(",");
-    var usersArray = [];
+    let usersArray = [];
     let index = 0;
     try {
-
         for (const id of idsArray) {
             const data = await client.query(
                 'SELECT * FROM users where user_id = $1', [id]
@@ -91,15 +89,15 @@ exports.addUser = async (req, res) => {
             'INSERT INTO external_users (username, email, mobile) VALUES ($1, $2, $3)', [username, email, mobile]
         );
 
-        const data1 = await client.query(
+        const data = await client.query(
             'SELECT userid FROM external_users where email=$1', [email]
         );
 
-        let size = data1.rows.length;
-        const userId = data1.rows[size - 1].userid;
+        let size = data.rows.length;
+        const userId = data.rows[size - 1].userid;
 
         await client.query(
-            "UPDATE fest SET external_user_id = external_user_id || '{$1}' where fest_id=$2", [userId, event_id]
+            `UPDATE fest SET external_user_id = external_user_id || '{${userId}}' where fest_id=$2`, [userId, event_id]
         );
 
         return res.status(200).json({
@@ -116,7 +114,6 @@ exports.addUser = async (req, res) => {
 exports.removeUser = async (req, res) => {
     const { userId, eventId } = req.body;
     try {
-
         await client.query(
             'UPDATE users SET fest_id = array_remove(fest_id, $1) WHERE user_id=$2', [eventId, userId]
         );

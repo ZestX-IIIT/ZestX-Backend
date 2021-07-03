@@ -37,60 +37,59 @@ exports.signUp = async (req, res) => {
   const { user_name, email, password, mobile } = req.body;
 
   try {
-    const data = await client.query(
+    const userData = await client.query(
       'SELECT * FROM users WHERE email=$1', [email]
     );
-    const userData = data.rows;
+    const userDetails = userData.rows;
 
-    if (userData.length != 0)
+    if (userDetails.length != 0)
       return res.status(400).json({
         error: "User already exists",
       });
-    bcrypt.hash(password, 10, async (err, hash) => {
-      const user = {
-        username: user_name,
-        email,
-        password: hash,
-        mobile,
-      };
 
-      await client.query(
-        'INSERT INTO users (user_name, email, password, mobile, is_verified, is_admin) VALUES ($1, $2, $3, $4, false, false)', [user.username, user.email, user.password, user.mobile]
-      );
-      const data1 = await client.query(
-        'SELECT * FROM users where email=$1', [user.email]
-      );
-      const userId = data1.rows[0].user_id;
+    const hash = await bcrypt.hash(password, 10);
+    const user = {
+      username: user_name,
+      email,
+      password: hash,
+      mobile,
+    };
 
-      const token = jwt.sign(
-        {
-          email: email,
-          userId: userId,
-        },
-        "" + process.env.SECRET_KEY
-      );
+    await client.query(
+      'INSERT INTO users (user_name, email, password, mobile, is_verified, is_admin) VALUES ($1, $2, $3, $4, false, false)', [user.username, user.email, user.password, user.mobile]
+    );
+    const currentUserData = await client.query(
+      'SELECT * FROM users where email=$1', [user.email]
+    );
+    const userId = currentUserData.rows[0].user_id;
 
-      var link = baseurl_for_user_verification + token;
+    const token = jwt.sign(
+      {
+        email: email,
+        userId: userId,
+      },
+      process.env.SECRET_KEY
+    );
 
-      var mailOptions = {
-        from: "verify.zestx@gmail.com",
-        to: `${user.email}`,
-        subject: "Confirmation mail",
-        html: `click <a href=${link}>here</a> to confirm your mail`,
-      };
+    let link = baseurl_for_user_verification + token;
 
-      transporter.sendMail(mailOptions, function (error, info) {
-        console.log("Email sent: " + info.response);
-      });
-      return res.status(200).json({
-        message: "User added successfully",
-        data: `${token}`,
-      });
+    let mailOptions = {
+      from: "verify.zestx@gmail.com",
+      to: `${user.email}`,
+      subject: "Confirmation mail",
+      html: `click <a href=${link}>here</a> to confirm your mail`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.status(200).json({
+      message: "User added successfully",
+      data: `${token}`,
     });
 
-  } catch (err1) {
+  } catch (err) {
     return res.status(500).json({
-      error: `${err1}`,
+      error: `${err}`,
     });
   }
 };
@@ -99,51 +98,47 @@ exports.signIn = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const data = await client.query(
+    const userData = await client.query(
       'SELECT * FROM users WHERE email=$1', [email]
     );
 
-    const userData = data.rows;
+    const userDetails = userData.rows;
 
-    if (userData.length == 0)
+    if (userDetails.length == 0)
       return res.status(400).json({
         error: "User does not exists, Please sign up!",
       });
 
-    const userId = data.rows[0].user_id;
+    const userId = userData.rows[0].user_id;
 
-    bcrypt.compare(password, userData[0].password, (err, result) => {
-      if (result) {
-        const token = jwt.sign(
-          {
-            email: email,
-            userId: userId,
-          },
-          process.env.SECRET_KEY
-        );
+    const result = await bcrypt.compare(password, userDetails[0].password);
+    if (!result)
+      return res.status(444).json({
+        error: "Incorrect password!",
+      });
 
-        return res.status(200).json({
-          message: "User signed in successfully",
-          token: token,
-        });
-      } else {
-        return res.status(444).json({
-          error: "Enter correct password!",
-        });
-      }
+    const token = jwt.sign(
+      {
+        email: email,
+        userId: userId,
+      },
+      process.env.SECRET_KEY
+    );
+
+    return res.status(200).json({
+      message: "User signed in successfully",
+      token: token,
     });
 
-  } catch (err1) {
+  } catch (err) {
     return res.status(500).json({
-      error: `${err1}`,
+      error: `${err}`,
     });
   }
 };
 
 async function mailSenderToSetPassword(email, res) {
-
   try {
-
     const token = jwt.sign(
       {
         email: email,
@@ -160,11 +155,10 @@ async function mailSenderToSetPassword(email, res) {
       html: `click <a href=${link}>here</a> to set your new password.`,
     };
 
-    supporter.sendMail(mailOptions, function (error, info) {
-      console.log("Email sent: " + info.response);
-      return res.status(200).json({
-        message: "mail sent successfully!",
-      });
+    await supporter.sendMail(mailOptions);
+
+    return res.status(200).json({
+      message: "mail sent successfully!",
     });
 
   } catch (error) {
