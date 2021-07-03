@@ -15,31 +15,6 @@ exports.getList = async (req, res) => {
   }
 };
 
-exports.getEvents = async (req, res) => {
-  const idsArray = req.body.ids.split(",");
-  var eventArray = [];
-  let index = 0;
-
-  try {
-    for (const id of idsArray) {
-      const data = await client.query(
-        'SELECT * FROM fest where fest_id=$1', [id]
-      );
-      let festData = data.rows[0];
-
-      eventArray[index] = festData;
-      index++;
-    }
-    return res.status(200).json({
-      data: eventArray,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      error: `${err}`,
-    });
-  }
-};
-
 exports.register = async (req, res) => {
   const eventId = req.body.id;
   const userId = req.userId;
