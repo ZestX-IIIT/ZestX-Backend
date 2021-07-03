@@ -1,37 +1,36 @@
 const jwt = require("jsonwebtoken");
 const client = require("../configs/database");
 
-exports.verifyToken = (req, res, next) => {
+exports.verifyToken = async (req, res, next) => {
   const token = req.headers.authorization;
 
-  if (token) {
-    jwt.verify(token, "" + process.env.SECRET_KEY, async (err, decoded) => {
-      if (err)
-        return res.status(403).json({
-          error: "Invalid token!",
-        });
+  if (!token)
+    return res.status(404).json({
+      message: "Token not found",
+    });
 
-      try {
-        const userEmail = decoded.email;
-        const userId = decoded.userId;
+  try {
+    const decoded = await jwt.verify(token, process.env.SECRET_KEY);
 
-        const data = await client
-          .query(`SELECT * FROM users where user_id = '${userId}'`);
+    const userEmail = decoded.email;
+    const userId = decoded.userId;
 
-        if (data.rows.length == 0)
-          return res.status(400).json({
-            message: "Invalid email or password",
-          });
+    const data = await client
+      .query(`SELECT * FROM users where user_id = '${userId}'`);
 
-        req.email = userEmail;
-        req.userId = userId;
-        next();
+    if (data.rows.length == 0)
+      return res.status(400).json({
+        message: "Invalid token",
+      });
 
-      } catch (err1) {
-        return res.status(500).json({
-          message: `${err1}`,
-        });
-      }
+    req.email = userEmail;
+    req.userId = userId;
+    next();
+
+  } catch (err) {
+    return res.status(500).json({
+      message: `${err}`,
     });
   }
+
 };
