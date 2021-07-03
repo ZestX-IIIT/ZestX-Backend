@@ -97,7 +97,7 @@ exports.addUser = async (req, res) => {
         const userId = data.rows[size - 1].userid;
 
         await client.query(
-            `UPDATE fest SET external_user_id = external_user_id || '{${userId}}' where fest_id=$2`, [userId, event_id]
+            `UPDATE fest SET external_user_id = external_user_id || '{${userId}}' where fest_id=$1`, [event_id]
         );
 
         return res.status(200).json({
