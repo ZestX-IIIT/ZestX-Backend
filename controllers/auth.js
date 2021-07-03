@@ -24,45 +24,12 @@ var supporter = nodemailer.createTransport({
 });
 
 exports.forgotPasswordForHomepage = (req, res) => {
-
   let userEmail = req.email;
-  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-  let passwordString = password.toString();
-
-  try {
-    bcrypt.hash(passwordString, 10, async function (err, hash) {
-      await client.query(
-        'UPDATE users SET password=$1 where email=$2', [hash, userEmail]
-      );
-    });
-    var mailOptions = {
-      from: "help.zestx@gmail.com",
-      to: `${userEmail}`,
-      subject: "Forgot Password",
-      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
-    };
-
-    supporter.sendMail(mailOptions, function (error, info) {
-      console.log("Email sent: " + info.response);
-    });
-
-    return res.status(200).json({
-      message: "new password sent successfully!",
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      error: `${error}`,
-    });
-  }
-
+  passwordSender(userEmail, res);
 }
 
 exports.forgotPasswordForSignIn = async (req, res) => {
-
   let userEmail = req.body.email;
-  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-  let passwordString = password.toString();
 
   try {
     const data = await client.query(
@@ -73,25 +40,7 @@ exports.forgotPasswordForSignIn = async (req, res) => {
         message: "Enter valid email-id!",
       });
 
-    bcrypt.hash(passwordString, 10, async function (err, hash) {
-      await client.query(
-        'UPDATE users SET password=$1 where email=$2', [hash, userEmail]
-      );
-    });
-    var mailOptions = {
-      from: "help.zestx@gmail.com",
-      to: `${userEmail}`,
-      subject: "New Password",
-      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
-    };
-
-    supporter.sendMail(mailOptions, function (error, info) {
-      console.log("Email sent: " + info.response);
-    });
-
-    return res.status(200).json({
-      message: "new password sent successfully!",
-    });
+    passwordSender(userEmail, res);
 
   } catch (error) {
     return res.status(500).json({
@@ -206,3 +155,33 @@ exports.signIn = async (req, res) => {
     });
   }
 };
+
+async function passwordSender(email, res) {
+  let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+  let passwordString = password.toString();
+  try {
+    bcrypt.hash(passwordString, 10, async function (err, hash) {
+      await client.query(
+        'UPDATE users SET password=$1 where email=$2', [hash, email]
+      );
+    });
+    let mailOptions = {
+      from: "help.zestx@gmail.com",
+      to: `${email}`,
+      subject: "New Password",
+      html: `Your new password is <b>${passwordString}</b>. You can change it using change password option in profile section.`,
+    };
+
+    supporter.sendMail(mailOptions, function (error, info) {
+      console.log("Email sent: " + info.response);
+      return res.status(200).json({
+        message: "new password sent successfully!",
+      });
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      error: `${error}`,
+    });
+  }
+}
