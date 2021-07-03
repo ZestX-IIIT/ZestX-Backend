@@ -2,19 +2,9 @@ const client = require("../configs/database");
 const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { transporter } = require("../configs/mailer");
 require('dotenv').config();
-
-var nodemailer = require("nodemailer");
-const baseurl_for_user_verification =
-  "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
-
-var transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "verify.zestx@gmail.com",
-    pass: process.env.VERIFY_PASSWORD,
-  },
-});
+const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
 exports.changePassword = async (req, res) => {
   const userId = req.userId;
@@ -40,9 +30,32 @@ exports.changePassword = async (req, res) => {
       });
 
     });
-  } catch (err1) {
+  } catch (err) {
     return res.status(500).json({
-      error: `${err1}`,
+      error: `${err}`,
+    });
+  }
+}
+
+exports.forgotPassword = async (req, res) => {
+
+  const { password, userToken } = req.body;
+  try {
+    const decoded = await jwt.verify(userToken, process.env.SECRET_KEY);
+    let userEmail = decoded.email;
+
+    const hash = await bcrypt.hash(password, 10);
+    await client.query(
+      'UPDATE users SET password=$1 where email=$2', [hash, userEmail]
+    );
+
+    return res.status(200).json({
+      message: "password updated successfully!",
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      error: `${err}`,
     });
   }
 }
@@ -105,7 +118,7 @@ exports.updateDetails = async (req, res) => {
             email: email,
             userId: userId,
           },
-          "" + process.env.SECRET_KEY
+          process.env.SECRET_KEY
         );
         var link = baseurl_for_user_verification + token;
 
@@ -127,33 +140,33 @@ exports.updateDetails = async (req, res) => {
 
       });
     }
-  } catch (err1) {
+  } catch (err) {
     return res.status(500).json({
-      error: `${err1}`,
+      error: `${err}`,
     });
   }
 };
 
 exports.verifyUser = async (req, res) => {
   const userToken = req.userToken;
-
-  var userId = jwt.decode(userToken).userId;
   var boolvalue = true;
 
   try {
+    const decoded = await jwt.verify(userToken, process.env.SECRET_KEY);
+    let userId = decoded.userId;
     await client.query(
       'UPDATE users SET is_verified=$1 where user_id=$2', [boolvalue, userId]
     );
-    var options = {
+    let options = {
       root: path.join(__dirname),
     };
 
-    var fileName = "user_verified.html";
+    let fileName = "user_verified.html";
     return res.status(200).sendFile(fileName, options);
 
   } catch (err) {
     return res.status(500).json({
-      error: `${err2}`,
+      error: `${err}`,
     });
   }
 };
