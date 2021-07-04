@@ -152,12 +152,10 @@ exports.verifyUser = async (req, res) => {
     await client.query(
       'UPDATE users SET is_verified=$1 where user_id=$2', [boolvalue, userId]
     );
-    let options = {
-      root: path.join(__dirname),
-    };
 
-    let fileName = "user_verified.html";
-    return res.status(200).sendFile(fileName, options);
+    return res.status(200).json({
+      message: "User verified successfully!",
+    });
 
   } catch (err) {
     return res.status(500).json({

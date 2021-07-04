@@ -4,7 +4,7 @@ const client = require("../configs/database");
 require("dotenv").config();
 const { transporter, supporter } = require("../configs/mailer");
 
-const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
+const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
 const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
 
 exports.forgotPasswordForHomepage = (req, res) => {
