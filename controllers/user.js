@@ -1,5 +1,4 @@
 const client = require("../configs/database");
-const path = require("path");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { transporter } = require("../configs/mailer");
