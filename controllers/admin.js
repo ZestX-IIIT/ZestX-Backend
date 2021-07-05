@@ -3,7 +3,7 @@ require('dotenv').config();
 
 exports.userDetails = async (req, res) => {
     const idsArray = req.body.ids.split(",");
-    let usersArray = [];
+    let userDetails = [];
     let index = 0;
     try {
         for (const id of idsArray) {
@@ -12,11 +12,11 @@ exports.userDetails = async (req, res) => {
             );
             let userData = data.rows[0];
 
-            usersArray[index] = userData;
+            userDetails[index] = userData;
             index++;
         }
         return res.status(200).json({
-            data: usersArray,
+            data: userDetails,
         });
 
     } catch (err) {
