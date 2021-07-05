@@ -158,12 +158,12 @@ async function mailSenderToSetPassword(email, res) {
     await supporter.sendMail(mailOptions);
 
     return res.status(200).json({
-      message: "mail sent successfully!",
+      message: "Mail Sent Successfully!",
     });
 
-  } catch (error) {
+  } catch (err) {
     return res.status(500).json({
-      error: `${error}`,
+      error: `${err}`,
     });
   }
 }
