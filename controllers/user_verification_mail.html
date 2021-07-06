@@ -6,8 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-      body {
-        background: red;
+      #imgContainer {
+        padding: 50px;
+        background: green;
+        width: 50vw;
+        height: fit-content;
+      }
+      #imgok {
+        height: auto;
+        width: 100px;
       }
       #greetingMsg {
         color: blue;
@@ -20,7 +27,20 @@
     </style>
   </head>
   <body>
-    <div id="greetingMsg">Hello {{username}}</div>
-    <a id="hrefText" href="{{tokenLink}}">click here</a>
+    <div id="imgContainer">
+      <!-- <img
+        id="imgok"
+        src="https://zestx.netlify.app/assets/_mail/mail_bg.jpg"
+        alt="hello this is"
+      /> -->
+      <iframe
+        title="this is noobdes 2"
+        src="https://zestx.netlify.app/assets/_mail/mail_bg.pdf"
+        height="20"
+        width="30"
+      ></iframe>
+      <div id="greetingMsg">Hello {{username}}</div>
+      <a id="hrefText" href="{{tokenLink}}">click here</a>
+    </div>
   </body>
 </html>
