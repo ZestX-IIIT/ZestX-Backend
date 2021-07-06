@@ -93,8 +93,10 @@ function notEligibleForRegister(userData, festId) {
 }
 
 function notEligibleForUnregister(userData, festId) {
-  const festIdsList = userData.rows[0].fest_id;
+  const isVerified = userData.rows[0].is_verified;
+  if (!isVerified) return true;
 
+  const festIdsList = userData.rows[0].fest_id;
   if (festIdsList.length == 0) return true;
   else if (festIdsList.includes(`${festId}`)) return false;
   else return true;
