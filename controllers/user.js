@@ -2,6 +2,7 @@ const client = require("../configs/database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { transporter } = require("../configs/mailer");
+const { passValidator } = require("../helper/password_validator");
 require('dotenv').config();
 const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
@@ -17,6 +18,13 @@ exports.changePassword = async (req, res) => {
     if (!result)
       return res.status(400).json({
         message: "Incorrect password!",
+      });
+
+    let passwordValidate = passValidator(password);
+
+    if (!passwordValidate[0])
+      return res.status(444).json({
+        error: `${passwordValidate[1]}`,
       });
 
     const hash = await bcrypt.hash(newPassword, 10);
@@ -42,6 +50,13 @@ exports.forgotPassword = async (req, res) => {
   try {
     const decoded = await jwt.verify(userToken, process.env.SECRET_KEY);
     let userEmail = decoded.email;
+
+    let passwordValidate = passValidator(password);
+
+    if (!passwordValidate[0])
+      return res.status(444).json({
+        error: `${passwordValidate[1]}`,
+      });
 
     const hash = await bcrypt.hash(password, 10);
     await client.query(
