@@ -1,8 +1,11 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const client = require("../configs/database");
+const fs = require('fs');
+const handlebars = require('handlebars');
 require("dotenv").config();
 const { transporter, supporter } = require("../configs/mailer");
+const { passValidator } = require("../helper/password_validator");
 
 const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
 const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
@@ -47,6 +50,13 @@ exports.signUp = async (req, res) => {
         error: "User already exists",
       });
 
+    let passwordValidate = passValidator(password);
+
+    if (!passwordValidate[0])
+      return res.status(444).json({
+        error: `${passwordValidate[1]}`,
+      });
+
     const hash = await bcrypt.hash(password, 10);
     const user = {
       username: user_name,
@@ -73,14 +83,29 @@ exports.signUp = async (req, res) => {
 
     let link = baseurl_for_user_verification + token;
 
-    let mailOptions = {
-      from: "verify.zestx@gmail.com",
-      to: `${user.email}`,
-      subject: "Confirmation mail",
-      html: `click <a href=${link}>here</a> to confirm your mail`,
+    let readHTMLFile = function (path, callback) {
+      fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+        callback(null, html);
+      });
     };
 
-    await transporter.sendMail(mailOptions);
+    readHTMLFile(__dirname + '/user_verification_mail.html', function (err, html) {
+      var template = handlebars.compile(html);
+      var replacements = {
+        username: `${user_name}`,
+        tokenLink: `${link}`
+      };
+      var htmlToSend = template(replacements);
+      let mailOptions = {
+        from: "verify.zestx@gmail.com",
+        to: `${user.email}`,
+        subject: "Confirmation mail",
+        html: htmlToSend,
+      };
+
+      transporter.sendMail(mailOptions);
+
+    });
 
     return res.status(200).json({
       message: "User added successfully",
