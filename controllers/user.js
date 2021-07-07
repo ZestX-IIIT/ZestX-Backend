@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { transporter } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
+const { validateEmail } = require("../helper/mail_verifier");
 require('dotenv').config();
 const baseurl_for_user_verification = "https://whispering-ridge-40670.herokuapp.com/user/verifyuser/";
 
@@ -125,6 +126,12 @@ exports.updateDetails = async (req, res) => {
       if (!result) {
         return res.status(400).json({
           message: "Incorrect password!",
+        });
+      }
+
+      if (!validateEmail(email)) {
+        return res.status(404).json({
+          error: "Invalid email",
         });
       }
 
