@@ -6,6 +6,7 @@ const handlebars = require('handlebars');
 require("dotenv").config();
 const { transporter, supporter } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
+const { validateEmail } = require("../helper/mail_verifier");
 
 const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
 const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
@@ -18,14 +19,22 @@ exports.forgotPasswordForHomepage = (req, res) => {
 exports.forgotPasswordForSignIn = async (req, res) => {
   let userEmail = req.body.email;
 
+  if (!validateEmail(userEmail)) {
+    return res.status(404).json({
+      error: "Invalid email",
+    });
+  }
+
   try {
     const data = await client.query(
       'SELECT * FROM users WHERE email=$1', [userEmail]
     );
-    if (data.rows.length == 0)
+
+    if (data.rows.length == 0) {
       return res.status(400).json({
-        message: "Enter valid email-id!",
+        message: "Invalid email!",
       });
+    }
 
     mailSenderToSetPassword(userEmail, res);
 
@@ -45,17 +54,25 @@ exports.signUp = async (req, res) => {
     );
     const userDetails = userData.rows;
 
-    if (userDetails.length != 0)
+    if (userDetails.length != 0) {
       return res.status(400).json({
         error: "User already exists",
       });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(404).json({
+        error: "Invalid email",
+      });
+    }
 
     let passwordValidate = passValidator(password);
 
-    if (!passwordValidate[0])
+    if (!passwordValidate[0]) {
       return res.status(444).json({
         error: `${passwordValidate[1]}`,
       });
+    }
 
     const hash = await bcrypt.hash(password, 10);
     const user = {
@@ -129,18 +146,26 @@ exports.signIn = async (req, res) => {
 
     const userDetails = userData.rows;
 
-    if (userDetails.length == 0)
+    if (userDetails.length == 0) {
       return res.status(400).json({
         error: "User does not exists, Please sign up!",
       });
+    }
+
+    if (!validateEmail(email)) {
+      return res.status(404).json({
+        error: "Invalid email",
+      });
+    }
 
     const userId = userData.rows[0].user_id;
 
     const result = await bcrypt.compare(password, userDetails[0].password);
-    if (!result)
+    if (!result) {
       return res.status(444).json({
         error: "Incorrect password!",
       });
+    }
 
     const token = jwt.sign(
       {

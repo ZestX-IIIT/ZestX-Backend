@@ -24,15 +24,17 @@ exports.register = async (req, res) => {
       'SELECT * FROM users where user_id = $1', [userId]
     );
 
-    if (!isVerified(data))
+    if (!isVerified(data)) {
       return res.status(400).json({
         err: "User not verified",
       });
+    }
 
-    if (isRegistered(data, eventId))
+    if (isRegistered(data, eventId)) {
       return res.status(404).json({
         err: "User already registered",
       });
+    }
 
     await client.query(
       `UPDATE users SET fest_id = fest_id || '{${eventId}}' where user_id=$1`, [userId]
@@ -62,15 +64,17 @@ exports.unregister = async (req, res) => {
       'SELECT * FROM users where user_id = $1', [userId]
     );
 
-    if (!isVerified(data))
+    if (!isVerified(data)) {
       return res.status(400).json({
         err: "User not verified",
       });
+    }
 
-    if (!isRegistered(data, eventId))
+    if (!isRegistered(data, eventId)) {
       return res.status(404).json({
         err: "User not registered",
       });
+    }
 
     await client.query(
       "UPDATE users SET fest_id = array_remove(fest_id, $1) WHERE user_id=$2", [eventId, userId]
@@ -93,13 +97,22 @@ exports.unregister = async (req, res) => {
 
 function isVerified(userData) {
   const verified = userData.rows[0].is_verified;
-  if (verified) return true;
+  if (verified) {
+    return true;
+  }
   return false;
 }
 
 function isRegistered(userData, festId) {
   const festIdsList = userData.rows[0].fest_id;
-  if (festIdsList == null) return false;
-  else if (festIdsList.includes(`${festId}`)) return true;
+
+  if (festIdsList == null) {
+    return false;
+  }
+
+  else if (festIdsList.includes(`${festId}`)) {
+    return true;
+  }
+
   else return false;
 }
