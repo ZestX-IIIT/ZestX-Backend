@@ -15,17 +15,19 @@ exports.changePassword = async (req, res) => {
 
     const result = await bcrypt.compare(oldPassword, data.rows[0].password);
 
-    if (!result)
+    if (!result) {
       return res.status(400).json({
         message: "Incorrect password!",
       });
+    }
 
     let passwordValidate = passValidator(password);
 
-    if (!passwordValidate[0])
+    if (!passwordValidate[0]) {
       return res.status(444).json({
         error: `${passwordValidate[1]}`,
       });
+    }
 
     const hash = await bcrypt.hash(newPassword, 10);
     await client.query(
@@ -53,10 +55,11 @@ exports.forgotPassword = async (req, res) => {
 
     let passwordValidate = passValidator(password);
 
-    if (!passwordValidate[0])
+    if (!passwordValidate[0]) {
       return res.status(444).json({
         error: `${passwordValidate[1]}`,
       });
+    }
 
     const hash = await bcrypt.hash(password, 10);
     await client.query(
@@ -103,10 +106,11 @@ exports.updateDetails = async (req, res) => {
 
     if (userEmail == email) {
       const result = await bcrypt.compare(password, data.rows[0].password);
-      if (!result)
+      if (!result) {
         return res.status(400).json({
           message: "Incorrect password!",
         });
+      }
 
       await client.query(
         'UPDATE users SET user_name=$1, mobile=$2 where user_id=$3', [user_name, mobile, userId]
@@ -118,10 +122,11 @@ exports.updateDetails = async (req, res) => {
 
     } else {
       const result = await bcrypt.compare(password, data.rows[0].password);
-      if (!result)
+      if (!result) {
         return res.status(400).json({
           message: "Incorrect password!",
         });
+      }
 
       await client.query(
         'UPDATE users SET user_name=$1, email=$2, mobile=$3, is_verified=$4 where user_id=$5', [user_name, email, mobile, boolvalue, userId]
