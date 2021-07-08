@@ -1,7 +1,8 @@
 const client = require("../configs/database");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { transporter } = require("../configs/mailer");
+const handlebars = require('handlebars');
+const { transporter, readHTMLFile } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
 const { validateEmail } = require("../helper/mail_verifier");
 require('dotenv').config();
@@ -147,19 +148,28 @@ exports.updateDetails = async (req, res) => {
       );
       var link = baseurl_for_user_verification + token;
 
-      var mailOptions = {
-        from: "verify.zestx@gmail.com",
-        to: `${email}`,
-        subject: "Confirmation mail",
-        html: `click <a href=${link}>here</a> to confirm your mail`,
-      };
+      readHTMLFile(__dirname + '/user_verification_mail.html', function (err, html) {
+        var template = handlebars.compile(html);
+        var replacements = {
+          username: `${user_name}`,
+          tokenLink: `${link}`
+        };
+        var userVerificationMail = template(replacements);
+        let mailOptions = {
+          from: "verify.zestx@gmail.com",
+          to: `${email}`,
+          subject: "Confirmation mail",
+          html: userVerificationMail,
+        };
 
-      await transporter.sendMail(mailOptions);
+        transporter.sendMail(mailOptions);
+      });
 
       return res.status(222).json({
         message: "details updated successfully!",
         token: `${token}`,
       });
+
     }
   } catch (err) {
     return res.status(500).json({

@@ -1,10 +1,9 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const client = require("../configs/database");
-const fs = require('fs');
 const handlebars = require('handlebars');
 require("dotenv").config();
-const { transporter, supporter } = require("../configs/mailer");
+const { transporter, supporter, readHTMLFile } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
 const { validateEmail } = require("../helper/mail_verifier");
 
@@ -100,24 +99,18 @@ exports.signUp = async (req, res) => {
 
     let link = baseurl_for_user_verification + token;
 
-    let readHTMLFile = function (path, callback) {
-      fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
-        callback(null, html);
-      });
-    };
-
     readHTMLFile(__dirname + '/user_verification_mail.html', function (err, html) {
       var template = handlebars.compile(html);
       var replacements = {
         username: `${user_name}`,
         tokenLink: `${link}`
       };
-      var htmlToSend = template(replacements);
+      var userVerificationMail = template(replacements);
       let mailOptions = {
         from: "verify.zestx@gmail.com",
         to: `${user.email}`,
         subject: "Confirmation mail",
-        html: htmlToSend,
+        html: userVerificationMail,
       };
 
       transporter.sendMail(mailOptions);
@@ -198,14 +191,21 @@ async function mailSenderToSetPassword(email, res) {
 
     let link = baseurl_for_reset_password + token;
 
-    let mailOptions = {
-      from: "help.zestx@gmail.com",
-      to: `${email}`,
-      subject: "New Password",
-      html: `click <a href=${link}>here</a> to set your new password.`,
-    };
+    readHTMLFile(__dirname + '/forgot_password_mail.html', function (err, html) {
+      var template = handlebars.compile(html);
+      var replacements = {
+        tokenLink: `${link}`
+      };
+      var resetPasswordMail = template(replacements);
+      let mailOptions = {
+        from: "help.zestx@gmail.com",
+        to: `${email}`,
+        subject: "Reset Password",
+        html: resetPasswordMail,
+      };
 
-    await supporter.sendMail(mailOptions);
+      supporter.sendMail(mailOptions);
+    });
 
     return res.status(200).json({
       message: "Mail Sent Successfully!",

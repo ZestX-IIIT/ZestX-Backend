@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const fs = require('fs');
 require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
@@ -17,4 +18,10 @@ const supporter = nodemailer.createTransport({
     },
 });
 
-module.exports = { transporter, supporter };
+const readHTMLFile = function (path, callback) {
+    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+        callback(null, html);
+    });
+};
+
+module.exports = { transporter, supporter, readHTMLFile };
