@@ -23,7 +23,7 @@ exports.changePassword = async (req, res) => {
       });
     }
 
-    let passwordValidate = passValidator(password);
+    let passwordValidate = passValidator(newPassword);
 
     if (!passwordValidate[0]) {
       return res.status(444).json({
@@ -127,6 +127,17 @@ exports.updateDetails = async (req, res) => {
       if (!result) {
         return res.status(400).json({
           message: "Incorrect password!",
+        });
+      }
+
+      const userData = await client.query(
+        'SELECT * FROM users WHERE email=$1', [email]
+      );
+      const userDetails = userData.rows;
+
+      if (userDetails.length != 0) {
+        return res.status(444).json({
+          error: "User already exists",
         });
       }
 
