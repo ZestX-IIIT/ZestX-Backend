@@ -10,11 +10,6 @@ const { validateEmail } = require("../helper/mail_verifier");
 const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
 const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
 
-exports.forgotPasswordForHomepage = (req, res) => {
-  let userEmail = req.email;
-  mailSenderToSetPassword(userEmail, res);
-}
-
 exports.forgotPasswordForSignIn = async (req, res) => {
   let userEmail = req.body.email;
 
@@ -35,7 +30,34 @@ exports.forgotPasswordForSignIn = async (req, res) => {
       });
     }
 
-    mailSenderToSetPassword(userEmail, res);
+    const token = jwt.sign(
+      {
+        email: email,
+      },
+      process.env.SECRET_KEY
+    );
+
+    let link = baseurl_for_reset_password + token;
+
+    readHTMLFile(__dirname + '/forgot_password_mail.html', function (err, html) {
+      var template = handlebars.compile(html);
+      var replacements = {
+        tokenLink: `${link}`
+      };
+      var resetPasswordMail = template(replacements);
+      let mailOptions = {
+        from: "help.zestx@gmail.com",
+        to: `${email}`,
+        subject: "Reset Password",
+        html: resetPasswordMail,
+      };
+
+      supporter.sendMail(mailOptions);
+    });
+
+    return res.status(200).json({
+      message: "Mail Sent Successfully!",
+    });
 
   } catch (error) {
     return res.status(500).json({
@@ -182,34 +204,7 @@ exports.signIn = async (req, res) => {
 
 async function mailSenderToSetPassword(email, res) {
   try {
-    const token = jwt.sign(
-      {
-        email: email,
-      },
-      process.env.SECRET_KEY
-    );
 
-    let link = baseurl_for_reset_password + token;
-
-    readHTMLFile(__dirname + '/forgot_password_mail.html', function (err, html) {
-      var template = handlebars.compile(html);
-      var replacements = {
-        tokenLink: `${link}`
-      };
-      var resetPasswordMail = template(replacements);
-      let mailOptions = {
-        from: "help.zestx@gmail.com",
-        to: `${email}`,
-        subject: "Reset Password",
-        html: resetPasswordMail,
-      };
-
-      supporter.sendMail(mailOptions);
-    });
-
-    return res.status(200).json({
-      message: "Mail Sent Successfully!",
-    });
 
   } catch (err) {
     return res.status(500).json({
