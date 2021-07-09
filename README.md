@@ -195,7 +195,6 @@ Admin would have a single user management page containing information for all th
 <li>pg</li>
 </ul>
 </li>
-<li>Express </li>
 <li>PostgreSQL</li>
 
 ## How to Set-Up?
