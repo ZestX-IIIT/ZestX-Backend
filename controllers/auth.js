@@ -7,8 +7,8 @@ const { transporter, supporter, readHTMLFile } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
 const { validateEmail } = require("../helper/mail_verifier");
 
-const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
-const baseurl_for_reset_password = "https://zestx.netlify.app/general/reset_password.html?token=";
+const baseurl_for_user_verification = "https://zestx.netlify.app/user_verification.html?token=";
+const baseurl_for_reset_password = "https://zestx.netlify.app/reset_password.html?token=";
 
 exports.forgotPasswordForSignIn = async (req, res) => {
   let userEmail = req.body.email;
@@ -32,7 +32,7 @@ exports.forgotPasswordForSignIn = async (req, res) => {
 
     const token = jwt.sign(
       {
-        email: email,
+        email: userEmail,
       },
       process.env.SECRET_KEY
     );
@@ -47,7 +47,7 @@ exports.forgotPasswordForSignIn = async (req, res) => {
       var resetPasswordMail = template(replacements);
       let mailOptions = {
         from: "help.zestx@gmail.com",
-        to: `${email}`,
+        to: `${userEmail}`,
         subject: "Reset Password",
         html: resetPasswordMail,
       };
@@ -202,13 +202,3 @@ exports.signIn = async (req, res) => {
   }
 };
 
-async function mailSenderToSetPassword(email, res) {
-  try {
-
-
-  } catch (err) {
-    return res.status(500).json({
-      error: `${err}`,
-    });
-  }
-}
