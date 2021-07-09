@@ -6,7 +6,7 @@ const { transporter, readHTMLFile } = require("../configs/mailer");
 const { passValidator } = require("../helper/password_validator");
 const { validateEmail } = require("../helper/mail_verifier");
 require('dotenv').config();
-const baseurl_for_user_verification = "https://zestx.netlify.app/general/user_verification.html?token=";
+const baseurl_for_user_verification = "https://zestx.netlify.app/user_verification.html?token=";
 
 exports.changePassword = async (req, res) => {
   const userId = req.userId;
