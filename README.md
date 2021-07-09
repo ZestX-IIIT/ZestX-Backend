@@ -16,6 +16,9 @@ Hosted Link : http://zestx.netlify.app/
 
 ZestX Frontend Repository: https://github.com/ZestX-IIIT/ZestX
 
+Figma UI: https://www.figma.com/file/gBKMpXErqC2KjZRX4Ycy3Q/ZestX?node-id=0%3A1
+
+<br>
 
 <br>
 
