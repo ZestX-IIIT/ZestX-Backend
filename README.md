@@ -14,7 +14,7 @@ Hosted Link : http://zestx.netlify.app/
 
 <br>
 
-ZestX Backend Repository: https://github.com/ZestX-IIIT/ZestX-Backend
+ZestX Frontend Repository: https://github.com/ZestX-IIIT/ZestX
 
 
 <br>
