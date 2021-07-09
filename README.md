@@ -124,7 +124,7 @@ Admin would have a single user management page containing information for all th
 
 ## Features
 
-### Security Features
+### Backend Features
 <ol>
 <li>Our website is more focused on security, and for that, we will be sending a verification mail to the visitor. Visitors can register only when the verification gets completed.
 </li>
@@ -141,7 +141,7 @@ Admin would have a single user management page containing information for all th
 
 </ol>
 
-### Utilization Features
+### Front-End Features
 <ol>
 <li>Our pages are fully responsive for all the devices to add the functionality of opening our website on any device.
 </li>
