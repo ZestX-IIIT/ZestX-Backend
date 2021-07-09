@@ -198,8 +198,13 @@ Admin would have a single user management page containing information for all th
 <li>Express </li>
 <li>PostgreSQL</li>
 
+## How to Set-Up?
 
-## Authors
+1. Clone the Repository 
+2. Open your Editior , preferably VS code
+3. Open Index.html with Live Server and you can access all the functionality of our Website
+
+## Developers
 
 - [Akash Gupta](https://github.com/akashgupta1909)
 - [Harshil Mendpara](https://github.com/HarshilMendpara)
