@@ -8,12 +8,11 @@ Hosted Link : http://zestx.netlify.app/
 
 <div align="center" width="100%">
  
-[[![Netlify Status](https://api.netlify.com/api/v1/badges/d14b602c-8e13-4e58-9c11-0c1226124b82/deploy-status)](https://app.netlify.com/sites/zestx/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d14b602c-8e13-4e58-9c11-0c1226124b82/deploy-status)](https://app.netlify.com/sites/zestx/deploys)
 ![License MIT](https://img.shields.io/github/license/zestx-iiit/zestx)
 ![COntributors](https://img.shields.io/github/contributors/zestx-iiit/zestx)
 
 </div>
-
 
 <br>
 
@@ -66,7 +65,7 @@ The next page would be loaded based on your credentials. As mentioned above, we 
 <br>
 <br>
 
- ![Home Page Image](https://github.com/ZestX-IIIT/ZestX/blob/main/assets/_readme_assets/Compressed_readme_assests/3.webp)
+![Home Page Image](https://github.com/ZestX-IIIT/ZestX/blob/main/assets/_readme_assets/Compressed_readme_assests/3.webp)
 
 <br>
 <br>
@@ -128,7 +127,7 @@ Admin would have a single user management page containing information for all th
 
 </ul>
 
-We, too, have a custom error page.  If mistakenly you went to a page not suppose to visit, there you will find an error page with an  option to go at the sign-in page
+We, too, have a custom error page. If mistakenly you went to a page not suppose to visit, there you will find an error page with an option to go at the sign-in page
 
 <br>
 
@@ -139,6 +138,7 @@ We, too, have a custom error page.  If mistakenly you went to a page not suppose
 ## Features
 
 ### Backend Features
+
 <ol>
 <li>Our website is more focused on security, and for that, we will be sending a verification mail to the visitor. Visitors can register only when the verification gets completed.
 </li>
@@ -152,10 +152,10 @@ We, too, have a custom error page.  If mistakenly you went to a page not suppose
 </li>
 <li>We haven’t used any passwords in our code. We tried to keep our security intact.</li>
 
-
 </ol>
 
 ### Front-End Features
+
 <ol>
 <li>Our pages are fully responsive for all the devices to add the functionality of opening our website on any device.
 </li>
@@ -176,7 +176,6 @@ We, too, have a custom error page.  If mistakenly you went to a page not suppose
 
 **Client Side** :
 
- 
 <li> HTML </li>
 <li> CSS</li>
  <li>Javascript</li>
@@ -193,7 +192,6 @@ We, too, have a custom error page.  If mistakenly you went to a page not suppose
 <li><a href="https://michalsnik.github.io/aos/">AOS</a>
 </li>
 </ul>
-
 
 **Server Side** :
 
@@ -214,11 +212,11 @@ We, too, have a custom error page.  If mistakenly you went to a page not suppose
 
 ## How to Set-Up?
 
-1. Clone the Repository 
+1. Clone the Repository
 2. Open your Editior , preferably VS code
 3. Open Index.html with Live Server and you can access all the functionality of our Website
 
-### Visitors Credentials : 
+### Visitors Credentials :
 
 Email : 404ironman404@gmail.com
 <br>
@@ -229,4 +227,3 @@ Password : 2W5wYY3JZ1LE8V16@
 - [Akash Gupta](https://github.com/akashgupta1909)
 - [Harshil Mendpara](https://github.com/HarshilMendpara)
 - [Raj Varsani](https://github.com/RajVarsani)
-
